@@ -17,6 +17,9 @@ public interface MenuControllerInterface {
 	@GetMapping(path = "/category", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<CategoryResponse> getCategory(HttpServletRequest request);
 	
-	@GetMapping(path = "/product", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+	@GetMapping(path = "/product/search", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
     public ResponseEntity<ProductResponse> getProducts(@RequestParam(required = true) Long categoryId,HttpServletRequest request);
+	
+	@GetMapping(path = "/product", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+    public ResponseEntity<ProductResponse> getProduct(@RequestParam(required = true) Long productId,HttpServletRequest request);
 }

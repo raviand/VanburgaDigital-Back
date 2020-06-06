@@ -38,5 +38,15 @@ public class MenuController implements MenuControllerInterface{
 		
 		return ResponseEntity.status(status).body(productResponse);
 	}
+	
+	@Override
+	public ResponseEntity<ProductResponse> getProduct(@RequestParam(required = true) Long productId,HttpServletRequest request){
+		
+		ProductResponse productResponse = new ProductResponse();
+		
+		HttpStatus status = menuService.getProduct(productResponse, productId);
+		
+		return ResponseEntity.status(status).body(productResponse);
+	}
 
 }
