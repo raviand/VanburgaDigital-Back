@@ -91,7 +91,6 @@ CREATE TABLE IF NOT EXISTS OrderDetail(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idProduct INT NOT NULL,
 idOrder INT NOT NULL,
-quantity INT NOT NULL,
 FOREIGN KEY(idProduct)
 		REFERENCES Product(id),
 FOREIGN KEY(idOrder)
@@ -109,25 +108,59 @@ FOREIGN KEY(idExtra)
 );
 
 ##TABLE'S POPULATION
-INSERT INTO category(name, description) values ('Burgas', 'Las mejores hamburguesas para que disfrutes con la concha de tu hermana!');
-INSERT INTO category(name, description) values ('Bebidas', 'Pedite una birra para disfrutar con tu Vanburga');
-INSERT INTO state(state) values ('El Talar de Pacheco');
-INSERT INTO state(state) values ('Altos del Talar');
-INSERT INTO state(state) values ('El Zorzal');
+INSERT INTO category(name, description) values ('Burgers','Las mejores del condado');
+INSERT INTO category(name, description) values ('Bebidas','Tomate una fresca');
+INSERT INTO category(name, description) values ('Acompañamientos','No podes pedir la hamburguesa sin unas buenas papas');
+INSERT INTO state(state) values ('Don Torcuato');
+INSERT INTO state(state) values ('Ricardo Rojas');
+INSERT INTO state(state) values ('El Talar');
+INSERT INTO state(state) values ('General Pacheco');
+INSERT INTO state(state) values ('Benavídez');
+INSERT INTO state(state) values ('Los troncos del Talar');
+INSERT INTO state(state) values ('Nordelta');
 INSERT INTO client(name, lastName, cellphone, mail) values ('Franco','Hildt','1123977072', 'franhildt@gmail.com');
 INSERT INTO client(name, lastName, cellphone, mail) values ('Nico','Rohland','1133886456', 'nrohland@gmail.com');
 INSERT INTO address(idclient, idstate, street, doorNumber, zipcode) values ('1','1','Los Alamos','895', '1667');
 INSERT INTO address(idclient, idstate, street, doorNumber, zipcode) values ('2','3','Las Amapolas','123' , '1667');
-INSERT INTO product(name, idcategory, price, description) values ('Vanburga Bacon XL','1','300','Doble carne, doble cheddar y mucho bacon');
 INSERT INTO product(name, idcategory, price, description) values ('Cerveza Andes IPA','2','80','IPA rubia');
-INSERT INTO extra(name, price) values ('Extra cheddar', '40');
-INSERT INTO extra(name, price) values ('Extra bacon', '40');
+INSERT INTO product(name, idcategory, price, description) values ('Cuarto Vanburga','1','400','Doble carne, Doble cheddar, Cebolla cortada, Ketchup Heinz, Mostaza Heinz');
+INSERT INTO product(name, idcategory, price, description) values ('Clásica','1','400','Doble carne, Doble cheddar, Cebolla cruda, Tomate, Lechuga, Pickles de pepino, Salsa Vanburga');
+INSERT INTO product(name, idcategory, price, description) values ('Cheeseburger','1','400','Triple carne, Sextuple cheddar, Bacon crocante');
+INSERT INTO product(name, idcategory, price, description) values ('Argenta','1','400','Doble carne, Doble provoleta, Chimichurri de la Abuela');
+INSERT INTO product(name, idcategory, price, description) values ('Crispy Onion','1','400','Doble carne, Doble cheddar, Cebolla crocante, Bacon crocante, Salsa Vanburga');
+INSERT INTO product(name, idcategory, price, description) values ('Oklahoma','1','400','Doble carne Smasheada con cebolla, Doble cheddar');
+INSERT INTO product(name, idcategory, price, description) values ('Sweet Onion','1','400','Doble carne, Doble cheddar, Cebolla caramelizada, , Bacon crocante');
+INSERT INTO product(name, idcategory, price, description) values ('Smoke Shack','1','400','Doble carne, Doble Emmenthal, Bacon crocante, Morrones bañados con tabasco, Salsita Shake Shack');
+INSERT INTO extra(name, price) values ('Extra Cheddar','50');
+INSERT INTO extra(name, price) values ('Extra Bacon','50');
+INSERT INTO extra(name, price) values ('Extra Medallón','50');
+INSERT INTO extra(name, price) values ('Extra papas con Cheddar y Bacon','50');
 INSERT INTO productByExtra(idExtra, idProduct) values ('1', '1');
 INSERT INTO productByExtra(idExtra, idProduct) values ('2', '1');
 INSERT INTO `Order`(idclient, comments, amount) values ('1','Haganme la hamburguesa con amor','420');
-INSERT INTO OrderDetail(idproduct,idorder,quantity) values ('1','1','1');
-INSERT INTO OrderDetail(idproduct,idorder,quantity) values ('2','1','1');
+INSERT INTO OrderDetail(idproduct,idorder) values ('1','1');
+INSERT INTO OrderDetail(idproduct,idorder) values ('2','1');
 INSERT INTO ExtraOrderDetail(idOrderDetail, idExtra) values ('1', '1');
+
+
+##TABLAS Y DATOS PARA EL ENVÍO DE MAILS
+CREATE TABLE IF NOT EXISTS SystemProperty(
+id INT PRIMARY KEY auto_increment NOT NULL,
+propertyKey varchar(50) NOT NULL,
+name varchar(50) not null,
+oldValue  varchar(50) not null,
+newValue  varchar(50) not null,
+description  varchar(150) not null
+);
+
+insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.hostNameString','MailManager Servidor SMTP','','localhost','Dirección IP o nombre del servidor SMTP para envío de mails.');
+insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.portString','MailManager Puerto del Servidor SMTP','','25','Puerto del servidor SMTP para envío de mails.');
+insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpAuthUserName','MailManager Usuario Servidor SMTP','','','Usuario de autenticacion del servidor SMTP para envío de mails.');
+insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpAuthPassword','MailManager Contraseña Servidor SMTP','','','Contraseña de autenticacion del servidor SMTP para envío de mails.');
+insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpAuthRequired','MailManager Autenticacion SMTP','','false','Se requiere de autenticacion en servidor SMTP para envío de mails. Si el valor es true se valida el usuario y contraseña.');
+insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpTls','MailManager Usa TLS SMTP','','false','Se enviará comando STARTTLS al servidor SMTP para envío de mails.');
+
+
 
 
 
