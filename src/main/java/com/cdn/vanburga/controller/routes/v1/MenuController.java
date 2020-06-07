@@ -1,5 +1,8 @@
 package com.cdn.vanburga.controller.routes.v1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cdn.vanburga.controller.routes.MenuControllerInterface;
+import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
@@ -29,6 +33,13 @@ public class MenuController implements MenuControllerInterface{
 
 	@Autowired
 	private MenuService menuService;
+	
+	
+	public ResponseEntity<List<State>> getState(HttpServletRequest request){
+
+		
+		return ResponseEntity.status(HttpStatus.OK).body(menuService.getStateList());
+	}
 	
 	@Operation(summary = "Get all Categories", description = "Obtiene todas las categorias cargadas en la base", tags = { "menu" })
     @ApiResponses(value = {

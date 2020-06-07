@@ -38,6 +38,7 @@ import com.cdn.vanburga.repository.OrderDetailRepository;
 import com.cdn.vanburga.repository.OrderRepository;
 import com.cdn.vanburga.repository.ProductExtraRepository;
 import com.cdn.vanburga.repository.ProductRepository;
+import com.cdn.vanburga.repository.StateRepository;
 
 @Service
 public class MenuService {
@@ -67,6 +68,9 @@ public class MenuService {
 	@Autowired @Lazy
 	private OrderDetailRepository orderDetailRepository;
 	
+	@Autowired @Lazy
+	private StateRepository stateRepository;
+	
 	private List<State> stateList;
 	
 	private Long lastId = new Long(11);
@@ -83,6 +87,12 @@ public class MenuService {
 		
 	}
 	
+	public List<State> getStateList() {
+		
+		this.stateList = stateRepository.findAll();
+		
+		return this.stateList;
+	}
 	
 	public HttpStatus getProductsByCategory(ProductResponse response, Long id) {
 		logger.info("Searching product list by category id [" + id.toString() + "]");
@@ -157,7 +167,7 @@ public class MenuService {
 		address.setDoorNumber(orderRequest.getClient().getAddress().getDoorNumber());
 		address.setFloor(orderRequest.getClient().getAddress().getFloor());
 		//Descomentar cuando se genera la busqueda de localidades
-		//address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
+		address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
 		address.setStreet(orderRequest.getClient().getAddress().getStreet());
 		address.setZipCode(orderRequest.getClient().getAddress().getZipCode());
 		address = addressRepository.save(address);

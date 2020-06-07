@@ -1,5 +1,7 @@
 package com.cdn.vanburga.controller.routes;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.MediaType;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
@@ -23,6 +26,9 @@ import com.cdn.vanburga.model.response.ProductResponse;
 public interface MenuControllerInterface {
 
 
+	@GetMapping(path = "/state", produces = (MediaType.APPLICATION_JSON_VALUE))
+	public ResponseEntity<List<State>> getState(HttpServletRequest request);
+	
 	@GetMapping(path = "/category", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<CategoryResponse> getCategory(HttpServletRequest request);
 	
