@@ -7,14 +7,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
+import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
+
+
 
 @Controller
 @CrossOrigin(origins = "*")
 public interface MenuControllerInterface {
+
 
 	@GetMapping(path = "/category", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<CategoryResponse> getCategory(HttpServletRequest request);
@@ -24,4 +31,7 @@ public interface MenuControllerInterface {
 	
 	@GetMapping(path = "/product", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
     public ResponseEntity<ProductResponse> getProduct(@RequestParam(required = true) Long productId,HttpServletRequest request);
+	
+	@PostMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+	public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest httpRequest); 
 }

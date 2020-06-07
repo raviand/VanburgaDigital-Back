@@ -1,46 +1,38 @@
 package com.cdn.vanburga.model.request;
 
-import java.math.BigDecimal;
 import java.util.List;
-import com.cdn.vanburga.model.State;
+
+import com.cdn.vanburga.model.response.ProductData;
+
 import lombok.Data;
 
+@Data
 public class OrderRequest {
 	
 	private ClientReq client;
 
-	private List<ProductReq> products;
+	private List<ProductData> products;
 
+	private String comment;
+	
 	@Data
 	public class ClientReq{
-	    String name;
-	    String cellphone;
-	    String lastName;
-	    String mail;
+		private String name;
+		private String cellphone;
+		private String lastName;
+		private String mail;
 	    
-	    AddressReq address;
+		private AddressReq address;
 
+	    @Data
 	    public class AddressReq{
-	    	String street;
-	    	String doorNumber;
-	    	String zipCode;
-	    	String floor;
-	    	String door;
-	    	
-	    	StateReq state;
-	    	
-	    	public class StateReq{
-	    		Long id;
-	    	}
+	    	private String street;
+	    	private String doorNumber;
+	    	private String zipCode;
+	    	private String floor;
+	    	private String door;
+	    	private Long state;
 	    }
 	}
 
-	@Data
-	public class ProductReq {
-		Long id;
-		String name;
-		
-		List<Long> extras;
-		
-	}
 }

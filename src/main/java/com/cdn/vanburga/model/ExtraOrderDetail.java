@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class OrderDetail {
+public class ExtraOrderDetail {
 
 	@Id
 	@GeneratedValue(
@@ -29,12 +29,10 @@ public class OrderDetail {
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
-    @JoinColumn(name = "idProduct", referencedColumnName = "id")
-	private Product product;
+    @JoinColumn(name = "idOrderDetail", referencedColumnName = "id")
+	private OrderDetail orderDetail;
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
-    @JoinColumn(name = "idOrder", referencedColumnName = "id")
-	private Order order;
-	
-	
+    @JoinColumn(name = "idExtra", referencedColumnName = "id")
+	private Extra extra;
 }
