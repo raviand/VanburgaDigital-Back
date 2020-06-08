@@ -1,7 +1,5 @@
 package com.cdn.vanburga.model;
 
-import java.math.BigDecimal;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -9,17 +7,19 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Extra {
+public class SystemProperty {
 
 	@Id
-	private Long id;
+	private Integer id;
+	
+	private String propertyKey;
 	
 	private String name;
 	
-	private String code;
+	private String oldValue;
 	
-	private BigDecimal price;
+	private String newValue;
 	
-	private Boolean available;
+	private String description;
 	
 }
