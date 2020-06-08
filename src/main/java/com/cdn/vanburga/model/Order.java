@@ -32,10 +32,11 @@ public class Order {
 	
 	@OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
     @JoinColumn(name = "idClient", referencedColumnName = "id")
-	@JsonIgnore
 	private Client client;
 	
 	private String comments;
+
+	private String status;
 	
 	private LocalDateTime createDate;
 	

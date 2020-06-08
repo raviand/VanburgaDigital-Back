@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -72,9 +73,7 @@ public class MenuService {
 	private StateRepository stateRepository;
 	
 	private List<State> stateList;
-	
-	private Long lastId = new Long(11);
-	
+		
 	public HttpStatus getAllCategories(CategoryResponse response) {
 		logger.info("Searching all categories");
 		List<Category> categoriesList = categoryRepository.findAll();
@@ -166,7 +165,7 @@ public class MenuService {
 		address.setDoor(orderRequest.getClient().getAddress().getDoor());
 		address.setDoorNumber(orderRequest.getClient().getAddress().getDoorNumber());
 		address.setFloor(orderRequest.getClient().getAddress().getFloor());
-		if(stateList.isEmpty()) {
+		if(stateList == null || stateList.isEmpty()) {
 			this.stateList = stateRepository.findAll();
 		}
 		address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
@@ -212,7 +211,6 @@ public class MenuService {
 		
 		//Formo la respuesta del servicio
 		orderResponse.setAddress(address);
-		orderResponse.setClient(client);
 		orderResponse.setOrder(order);
 		orderResponse.setOrderDetail(orderRequest.getProducts());
 		orderResponse.setMessage("Order register successfully");
@@ -224,8 +222,44 @@ public class MenuService {
 	
 	public HttpStatus getOrder(Long orderId, OrderResponse orderResponse) {
 		
-		//Order order = orderRepository.fin
+		Optional<Order> order = orderRepository.findById(orderId);
 		
+		if(order.isPresent()) {
+			Optional<Address> address = addressRepository.findByClient(order.get().getClient()); 
+			Optional<List<OrderDetail>> orderDetailList = orderDetailRepository.findByOrder(order.get());
+			Optional<List<ExtraOrderDetail>> extraOrderDetailList = extraOrderDetailRepository.findByOrder(order.get());
+			List<Extra> extras = new ArrayList<Extra>();
+			List<ProductData> productDataList = new ArrayList<ProductData>();
+			if(orderDetailList.isPresent()) {
+				for (OrderDetail od : orderDetailList.get()) {
+					ProductData pd = new ProductData();
+					pd.setProduct(od.getProduct());
+					if(extraOrderDetailList.isPresent()) {		
+						for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
+							if(ex.getOrderDetail().getId() == od.getId()) {
+								extras.add(ex.getExtra());
+							}
+						}
+					}
+					pd.setExtras(extras);
+					productDataList.add(pd);
+					extras = new ArrayList<Extra>();
+				}
+			}
+			orderResponse.setOrder(order.get());
+			orderResponse.setAddress(address.get());
+			orderResponse.setOrderDetail(productDataList);
+			
+		}else {
+			orderResponse.setMessage("No order Found");
+			orderResponse.setCode(10);
+			orderResponse.setStatus(HttpStatus.NOT_FOUND);
+			return HttpStatus.NOT_FOUND;
+		}
+		
+		orderResponse.setMessage("Order found");
+		orderResponse.setCode(0);
+		orderResponse.setStatus(HttpStatus.OK);
 		return HttpStatus.OK;
 	}
 	

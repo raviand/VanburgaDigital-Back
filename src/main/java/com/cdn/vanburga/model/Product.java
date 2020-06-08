@@ -34,6 +34,8 @@ public class Product {
 	private BigDecimal price;
 	
 	private String description;
+
+	private String code;
 	
 	private Boolean available;
 	
