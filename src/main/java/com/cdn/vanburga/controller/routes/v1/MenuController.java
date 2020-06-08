@@ -95,5 +95,15 @@ public class MenuController implements MenuControllerInterface{
 		
 		return ResponseEntity.status(status).body(orderResponse);
 	}
+	
+	@Override
+	public ResponseEntity<OrderResponse> updateOrder(OrderRequest orderRequest, HttpServletRequest request) {//Es necesario que llegue orderrequest?
+
+		OrderResponse orderResponse = new OrderResponse(); 
+		
+		HttpStatus status = menuService.updateOrder(orderRequest, orderResponse);
+		
+		return ResponseEntity.status(status).body(orderResponse);
+	}
 
 }

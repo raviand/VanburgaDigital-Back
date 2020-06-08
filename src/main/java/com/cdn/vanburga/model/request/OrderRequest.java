@@ -15,6 +15,10 @@ public class OrderRequest {
 
 	private String comment;
 	
+	private Long orderId;
+	
+	private String orderStatus;
+	
 	@Data
 	public class ClientReq{
 		private String name;

@@ -206,6 +206,7 @@ public class MenuService {
 		}
 		//Registro el monto total del pedido
 		order.setAmount(totalAmount);
+		order.setStatus("Pending");
 		order = orderRepository.save(order);
 		
 		
@@ -214,6 +215,29 @@ public class MenuService {
 		orderResponse.setOrder(order);
 		orderResponse.setOrderDetail(orderRequest.getProducts());
 		orderResponse.setMessage("Order register successfully");
+		orderResponse.setCode(0);
+		orderResponse.setStatus(HttpStatus.OK);
+		
+		return HttpStatus.OK;
+	}
+	
+	public HttpStatus updateOrder(OrderRequest orderRequest, OrderResponse orderResponse) {
+		
+		logger.info("Updating order");
+		
+		Optional<Order> order = orderRepository.findById(orderRequest.getOrderId());
+		
+		if(!order.isPresent()) {
+			orderResponse.setMessage("Order not found");
+			orderResponse.setCode(404);
+			orderResponse.setStatus(HttpStatus.NOT_FOUND);
+			return HttpStatus.NOT_FOUND;
+		}
+		
+		order.get().setStatus(orderRequest.getOrderStatus());
+		
+		orderResponse.setOrder(orderRepository.save(order.get()));
+		orderResponse.setMessage("Order updated");
 		orderResponse.setCode(0);
 		orderResponse.setStatus(HttpStatus.OK);
 		
