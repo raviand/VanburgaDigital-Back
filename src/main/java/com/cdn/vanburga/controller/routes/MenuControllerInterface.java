@@ -26,18 +26,30 @@ import com.cdn.vanburga.model.response.ProductResponse;
 public interface MenuControllerInterface {
 
 
+	/**********************************************************************
+	 * endpoints de combos
+	 * ********************************************************************/
 	@GetMapping(path = "/state", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<List<State>> getState(HttpServletRequest request);
 	
 	@GetMapping(path = "/category", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<CategoryResponse> getCategory(HttpServletRequest request);
 	
+	/**********************************************************************
+	 * endpoints de Producto
+	 * ********************************************************************/
 	@GetMapping(path = "/product/search", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
     public ResponseEntity<ProductResponse> getProducts(@RequestParam(required = true) Long categoryId,HttpServletRequest request);
 	
 	@GetMapping(path = "/product", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
     public ResponseEntity<ProductResponse> getProduct(@RequestParam(required = true) Long productId,HttpServletRequest request);
 	
+	/**********************************************************************
+	 * endpoints de Orden
+	 * ********************************************************************/
 	@PostMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest httpRequest); 
+	
+	@GetMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+    public ResponseEntity<OrderResponse> getOrder(@RequestParam(required = true) Long orderId,HttpServletRequest request);
 }

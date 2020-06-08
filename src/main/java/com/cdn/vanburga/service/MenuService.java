@@ -166,7 +166,9 @@ public class MenuService {
 		address.setDoor(orderRequest.getClient().getAddress().getDoor());
 		address.setDoorNumber(orderRequest.getClient().getAddress().getDoorNumber());
 		address.setFloor(orderRequest.getClient().getAddress().getFloor());
-		//Descomentar cuando se genera la busqueda de localidades
+		if(stateList.isEmpty()) {
+			this.stateList = stateRepository.findAll();
+		}
 		address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
 		address.setStreet(orderRequest.getClient().getAddress().getStreet());
 		address.setZipCode(orderRequest.getClient().getAddress().getZipCode());
@@ -185,15 +187,12 @@ public class MenuService {
 		//Registra los productos y por cada producto, sus extras
 		
 		//List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
-		List<ExtraOrderDetail> extraOrderDetail = new ArrayList<ExtraOrderDetail>();
 		for(ProductData pd : orderRequest.getProducts()) {
 			OrderDetail orderDetail = new OrderDetail();
 			orderDetail.setOrder(order);
 			orderDetail.setProduct(pd.getProduct());
 			
-			//orderDetail.setId(lastId);
 			totalAmount = totalAmount.add(pd.getProduct().getPrice());
-			//lastId = Long.sum(lastId, 1);
 			orderDetail = orderDetailRepository.save(orderDetail);
 			if(pd.getExtras() != null && !pd.getExtras().isEmpty()) {				
 				for(Extra e : pd.getExtras()) {
@@ -210,8 +209,6 @@ public class MenuService {
 		order.setAmount(totalAmount);
 		order = orderRepository.save(order);
 		
-		//orderDetailList = orderDetailRepository.saveAll(orderDetailList);
-		//extraOrderDetail = extraOrderDetailRepository.saveAll(extraOrderDetail);
 		
 		//Formo la respuesta del servicio
 		orderResponse.setAddress(address);
@@ -221,6 +218,13 @@ public class MenuService {
 		orderResponse.setMessage("Order register successfully");
 		orderResponse.setCode(0);
 		orderResponse.setStatus(HttpStatus.OK);
+		
+		return HttpStatus.OK;
+	}
+	
+	public HttpStatus getOrder(Long orderId, OrderResponse orderResponse) {
+		
+		//Order order = orderRepository.fin
 		
 		return HttpStatus.OK;
 	}

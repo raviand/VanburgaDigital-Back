@@ -86,4 +86,14 @@ public class MenuController implements MenuControllerInterface{
 		
 	}
 
+	@Override
+	public ResponseEntity<OrderResponse> getOrder(Long orderId, HttpServletRequest request) {
+
+		OrderResponse orderResponse = new OrderResponse();
+		
+		HttpStatus status = menuService.getOrder(orderId, orderResponse);
+		
+		return ResponseEntity.status(status).body(orderResponse);
+	}
+
 }
