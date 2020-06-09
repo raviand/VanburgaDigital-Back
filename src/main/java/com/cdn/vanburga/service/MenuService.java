@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cdn.vanburga.exception.MissingFieldExcption;
+import com.cdn.vanburga.exception.ServiceException;
 import com.cdn.vanburga.model.Address;
 import com.cdn.vanburga.model.Category;
 import com.cdn.vanburga.model.Client;
@@ -287,8 +289,9 @@ public class MenuService {
 		return HttpStatus.OK;
 	}
 	
-	private void validateFields(OrderRequest orderRequest) {
-		//Validaciones de campos obligatorios y con formato correcto
+	private void validateFields(OrderRequest orderRequest) throws ServiceException{
+
+		if(orderRequest.getClient() == null) throw new MissingFieldExcption("Client missing");
 		
 	}
 	
