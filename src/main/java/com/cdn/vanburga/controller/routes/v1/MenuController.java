@@ -105,5 +105,24 @@ public class MenuController implements MenuControllerInterface{
 		
 		return ResponseEntity.status(status).body(orderResponse);
 	}
+	
+	public ResponseEntity<OrderResponse> findOrder(
+    		String status,
+    		String dateFrom,
+    		String dateTo,
+    		String clientId,
+    		HttpServletRequest request){
+		
+		OrderResponse orderResponse = new OrderResponse();
+				
+		HttpStatus httpStatus = menuService.findOrders(
+				status,
+	    		dateFrom,
+	    		dateTo,
+	    		clientId, orderResponse);
+		
+		return ResponseEntity.status(httpStatus).body(orderResponse);
+	
+	}
 
 }

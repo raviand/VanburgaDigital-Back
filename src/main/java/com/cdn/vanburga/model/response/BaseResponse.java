@@ -1,7 +1,5 @@
 package com.cdn.vanburga.model.response;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Data;
 
 @Data
@@ -11,6 +9,6 @@ public class BaseResponse {
 	
 	private Integer code;
 	
-	private HttpStatus status;
+	private Integer status;
 	
 }

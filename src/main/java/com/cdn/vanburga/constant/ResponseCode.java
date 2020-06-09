@@ -10,6 +10,8 @@ public enum ResponseCode {
 	
 	REFUND_SUCCESS (0, "Refund successfully"),
 	
+	INVALID_NUMBER(7, "number must not be less than 1"),
+
 	NOT_FOUND (8, "Register not found"),
 	
 	ERROR_PAGE_INDEX(9 , "Page number must not be less than 1"),
@@ -20,7 +22,7 @@ public enum ResponseCode {
 	
 	DATE_ERROR(12, "Date from can not be later than date to"),
 	
-	REQUIRE_COMPANY(13, "The entry of Company code is mandatory"),
+	NUMBER_TYPE_ERROR(13, "Field must be numeric"),
 	
 	REQUIRE_DATE(14, "The entry of dates from and to is mandatory"),
 
@@ -28,15 +30,15 @@ public enum ResponseCode {
 	
 	DATE_FORMAT_ERROR(16, "Wrong Date format"),
 	
-	WRONG_COMPANY_OR_STORE(17, "Merchant Code or merchant store code does not exist"),
+	//WRONG_COMPANY_OR_STORE(17, "Merchant Code or merchant store code does not exist"),
 	
 	MISSING_FIELD(18, "Missing mandatory field: "),
 	
-	MERCHANT_ORDER_ALREADY_EXIST(19, "MerchantOrderId value already exist"),
+	//MERCHANT_ORDER_ALREADY_EXIST(19, "MerchantOrderId value already exist"),
 	
 	INVALID_FORMAT(20, "Invalid field format"),
 	
-	INVALID_PAYMENT_METHOD(21, "Invalid Payment Method"),
+	//INVALID_PAYMENT_METHOD(21, "Invalid Payment Method"),
 	
 	INVALID_STATUS(22, "Can not execute the operation with the actual status"),
 	
@@ -44,21 +46,21 @@ public enum ResponseCode {
 	
 	INVALID_AMOUNT(24, "Invalid amount"),
 	
-	VTOL_CONNECTION_FAIL(25, "Connection with VTOL fail"),
+	//VTOL_CONNECTION_FAIL(25, "Connection with VTOL fail"),
 	
-	ORDER_NOT_FOUND(26, "Original Payment Order not found"),
+	//ORDER_NOT_FOUND(26, "Original Payment Order not found"),
 	
-	ITEM_LIMIT(27, "Excedes the MAX limit of items or item value size"),
+	//ITEM_LIMIT(27, "Excedes the MAX limit of items or item value size"),
 	
-	INVALID_CONTRY(28, "Invalid Country Code"),
+	//INVALID_CONTRY(28, "Invalid Country Code"),
 
-	CURRENCY_CODE_ERROR(29, "Invalid Currency Code, must be '$' or 'U$S'" ),
+	//CURRENCY_CODE_ERROR(29, "Invalid Currency Code, must be '$' or 'U$S'" ),
 
-	REFUNDED_AMOUNT_ERROR(30, "Refund transaction was made with diferent amount" ),
+	//REFUNDED_AMOUNT_ERROR(30, "Refund transaction was made with diferent amount" ),
 
 	EMAIL_FORMAT_ERROR(31, "Email field does not have the right format" ),
 	
-	MERCHANT_ORIGIN_ERROR(32, "The merchant code does not correspond to the transaction" ),
+	//MERCHANT_ORIGIN_ERROR(32, "The merchant code does not correspond to the transaction" ),
 	
 	MAIL_ERROR(33, "Error sending email to customer" ),
 

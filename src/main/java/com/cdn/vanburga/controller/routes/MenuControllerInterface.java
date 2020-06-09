@@ -54,6 +54,16 @@ public interface MenuControllerInterface {
 	@GetMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
     public ResponseEntity<OrderResponse> getOrder(@RequestParam(required = true) Long orderId,HttpServletRequest request);
 	
+	@GetMapping(path = "/order/search", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+    public ResponseEntity<OrderResponse> findOrder(
+    		@RequestParam (required = false) String status,
+    		@RequestParam (required = false) String dateFrom,
+    		@RequestParam (required = false) String dateTo,
+    		@RequestParam (required = false) String clientId,
+    		HttpServletRequest request);
+	
 	@PutMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<OrderResponse> updateOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest httpRequest); 
+	
+	
 }

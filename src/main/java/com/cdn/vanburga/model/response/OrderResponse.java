@@ -21,4 +21,6 @@ public class OrderResponse extends BaseResponse{
 	
 	private List<ProductData> orderDetail;
 	
+	private List<Order> orders;
+	
 }
