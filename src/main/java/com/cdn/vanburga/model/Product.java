@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
+import javax.persistence.Transient;
 
 import lombok.Data;
 
@@ -38,6 +39,10 @@ public class Product {
 	private String code;
 	
 	private Boolean available;
+	
+	@Transient
+	private List<Extra> extras;
+	
 	
 	private Product() {}
 	

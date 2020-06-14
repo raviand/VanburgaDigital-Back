@@ -16,6 +16,6 @@ public class ProductResponse extends BaseResponse{
 	
 	private List<Product> products;
 	
-	private ProductData product;
+	private Product product;
 	
 }

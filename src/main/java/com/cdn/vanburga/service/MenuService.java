@@ -103,19 +103,28 @@ public class MenuService {
 		logger.info("Searching product list by category id [" + id.toString() + "]");
 		Optional<List<Product>> productList = productRepository.findByCategory(new Category(id));
 		
-		if (productList.isPresent()) {
-			response.setProducts(productList.get());
-			response.setCode(ResponseCode.FOUND.fieldNumber());
-			response.setStatus(HttpStatus.OK.value());
-			response.setMessage(ResponseCode.FOUND.fieldName());
-			return HttpStatus.OK;
+		if (!productList.isPresent()) {
+			logger.warn("No product found");
+			response.setStatus(HttpStatus.NOT_FOUND.value());
+			response.setCode(ResponseCode.NOT_FOUND.fieldNumber());
+			response.setMessage(ResponseCode.NOT_FOUND.fieldName());
+			return HttpStatus.NOT_FOUND;
 		}
-		logger.warn("No product found");
-		response.setStatus(HttpStatus.NOT_FOUND.value());
-		response.setCode(ResponseCode.NOT_FOUND.fieldNumber());
-		response.setMessage(ResponseCode.NOT_FOUND.fieldName());
-		
-		return HttpStatus.NOT_FOUND;
+		List<ProductData> productDataList = new ArrayList<ProductData>();
+		for(Product p : productList.get()) {
+			Optional<List<ProductExtra>> productExtraList = productExtraRepository.findByProductExtraProduct(p.getId());
+			if(productExtraList.isPresent()) {	
+				logger.debug("Extras found - size: " + productList.get().size());
+				List<Extra> extras = new ArrayList<Extra>();
+				productExtraList.get().stream().forEach(e -> extras.add(e.getProductExtra().getExtra()));
+				p.setExtras(extras);
+			}
+		}
+		response.setProducts(productList.get());
+		response.setCode(ResponseCode.FOUND.fieldNumber());
+		response.setStatus(HttpStatus.OK.value());
+		response.setMessage(ResponseCode.FOUND.fieldName());
+		return HttpStatus.OK;
 		
 	}
 	
@@ -127,15 +136,13 @@ public class MenuService {
 		if (product.isPresent()) {
 			logger.debug("Product found - name: [" + product.get().getName() +"] Searching Extras of this product " );
 			Optional<List<ProductExtra>> productList = productExtraRepository.findByProductExtraProduct(product.get().getId());
-			ProductData productData = new ProductData();
-			productData.setProduct(product.get());
 			if(productList.isPresent()) {	
 				logger.debug("Extras found - size: " + productList.get().size());
 				List<Extra> extras = new ArrayList<Extra>();
 				productList.get().stream().forEach(e -> extras.add(e.getProductExtra().getExtra()));
-				productData.setExtras(extras);
+				product.get().setExtras(extras);
 			}
-			response.setProduct(productData);
+			response.setProduct(product.get());
 			response.setCode(ResponseCode.FOUND.fieldNumber());
 			response.setStatus(HttpStatus.OK.value());
 			response.setMessage(ResponseCode.FOUND.fieldName());
