@@ -19,6 +19,8 @@ public class OrderRequest {
 	
 	private String orderStatus;
 	
+	private Boolean delivery;
+	
 	@Data
 	public class ClientReq{
 		private String name;

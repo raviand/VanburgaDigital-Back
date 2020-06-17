@@ -28,6 +28,8 @@ public class ExtraOrderDetail {
 	        strategy = "native")
 	private Long id;
 	
+	private Integer quantity;
+	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
     @JoinColumn(name = "idOrderDetail", referencedColumnName = "id")
 	private OrderDetail orderDetail;

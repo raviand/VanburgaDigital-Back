@@ -20,6 +20,10 @@ public class Extra {
 	
 	private BigDecimal price;
 	
+	private Integer rawMaterial;
+	
+	private Integer quantityLimit;
+	
 	private Boolean available;
 	
 }
