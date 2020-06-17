@@ -49,8 +49,10 @@ id INT PRIMARY KEY,
 code varchar (50) null unique,
 name VARCHAR(255) NOT NULL,
 idCategory INT NOT NULL,
+rawMaterial INT DEFAULT 0,
 price DECIMAL(13,2) NOT NULL,
 description VARCHAR(2000) NULL,
+color varchar(10),
 available BOOLEAN DEFAULT TRUE,
 FOREIGN KEY(idCategory)
 		REFERENCES Category(id)
@@ -61,6 +63,8 @@ CREATE TABLE IF NOT EXISTS Extra(
 id INT PRIMARY KEY,
 code varchar(50) null unique,
 name VARCHAR(150) NOT NULL,
+rawMaterial INT DEFAULT 0,
+quantityLimit INT DEFAULT 1,
 price DECIMAL(13,2) NOT NULL,
 available BOOLEAN DEFAULT TRUE
 );
@@ -82,11 +86,11 @@ FOREIGN KEY(idProduct)
 CREATE TABLE IF NOT EXISTS `Order`(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idClient INT NOT NULL,
-code varchar (10) null,
 status varchar (50) null,
 comments VARCHAR(2000) NULL,
 createDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 amount DECIMAL(13,2) NOT NULL,
+delivery BOOL default false,
 FOREIGN KEY(idClient)
 		REFERENCES Client(id)
 );
@@ -105,6 +109,7 @@ CREATE TABLE IF NOT EXISTS ExtraOrderDetail(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idOrderDetail INT NOT NULL,
 idExtra INT NOT NULL,
+quantity INT NOT NULL,
 FOREIGN KEY(idOrderDetail)
 		REFERENCES OrderDetail(id),
 FOREIGN KEY(idExtra)
@@ -195,7 +200,24 @@ insert into SystemProperty (propertyKey,name,oldValue,newValue,description) valu
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpTls','MailManager Usa TLS SMTP','','false','Se enviará comando STARTTLS al servidor SMTP para envío de mails.');
 
 
+/*
+select ord.id, ord.delivery, ord.status, ord.comments, ord.createDate, ord.amount,
+cli.id as clientId, cli.name, cli.lastName, cli.cellphone, cli.mail,
+addr.id as addressId, addr.street,addr.doornumber, addr.zipcode, addr.floor, addr.door,
+st.id as stateId, st.state,
+odet.id as detailId,
+prod.id as productId, prod.code, prod.name, prod.description,
+ext.id as extraId, ext.code, ext.name, ext.price
+from `Order` as ord
+left join client as cli on ord.idclient=cli.id
+left join address as addr on addr.idclient=cli.id
+left join state as st on st.id=addr.idState
+left join orderdetail as odet on odet.idOrder=ord.id
+left join product as prod on prod.id=odet.idproduct
+left join extraorderdetail as extd on extd.idorderdetail=odet.id
+left join extra as ext on ext.id=extd.idextra
 
+where ord.id=1; */
 
 
 ##VANBERGA INC. TODOS LOS DERECHOS RESERVADOS
