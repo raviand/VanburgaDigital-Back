@@ -1,10 +1,11 @@
 package com.cdn.vanburga.controller.routes.v1;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,19 +19,23 @@ import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
 import com.cdn.vanburga.service.MenuService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Controller
 @Tag(name = "menu", description = "the Menu API")
 public class MenuController implements MenuControllerInterface{
 
+	private static final Logger logger = LogManager.getLogger(MenuController.class);
+	
 	@Autowired
 	private MenuService menuService;
 	
@@ -78,11 +83,19 @@ public class MenuController implements MenuControllerInterface{
 	@Override
 	public ResponseEntity<OrderResponse> createOrder(OrderRequest orderRequest, HttpServletRequest httpRequest){
 		
-		OrderResponse orderResponse = new OrderResponse();
+		try {
+			OrderResponse orderResponse = new OrderResponse();
+			ObjectMapper Obj = new ObjectMapper();
+			logger.info("recive: " + Obj.writerWithDefaultPrettyPrinter().writeValueAsString(orderRequest));
 		
-		HttpStatus status = menuService.createOrder(orderRequest, orderResponse);
-		
-		return ResponseEntity.status(status).body(orderResponse);
+			HttpStatus status = menuService.createOrder(orderRequest, orderResponse);
+			
+			return ResponseEntity.status(status).body(orderResponse);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 		
 	}
 

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -201,12 +200,12 @@ public class MenuService {
 			//Registra los productos y por cada producto, sus extras
 			
 			//List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
-			for(ProductData pd : orderRequest.getProducts()) {
+			for(Product pd : orderRequest.getProducts()) {
 				OrderDetail orderDetail = new OrderDetail();
 				orderDetail.setOrder(order);
-				orderDetail.setProduct(pd.getProduct());
+				orderDetail.setProduct(pd);
 				
-				totalAmount = totalAmount.add(pd.getProduct().getPrice());
+				totalAmount = totalAmount.add(pd.getPrice());
 				orderDetail = orderDetailRepository.save(orderDetail);
 				if(pd.getExtras() != null && !pd.getExtras().isEmpty()) {				
 					for(Extra e : pd.getExtras()) {
@@ -290,11 +289,9 @@ public class MenuService {
 			Optional<List<OrderDetail>> orderDetailList = orderDetailRepository.findByOrder(order.get());
 			Optional<List<ExtraOrderDetail>> extraOrderDetailList = extraOrderDetailRepository.findByOrder(order.get());
 			List<Extra> extras = new ArrayList<Extra>();
-			List<ProductData> productDataList = new ArrayList<ProductData>();
+			List<Product> productDataList = new ArrayList<Product>();
 			if(orderDetailList.isPresent()) {
 				for (OrderDetail od : orderDetailList.get()) {
-					ProductData pd = new ProductData();
-					pd.setProduct(od.getProduct());
 					if(extraOrderDetailList.isPresent()) {		
 						for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
 							if(ex.getOrderDetail().getId() == od.getId()) {
@@ -302,8 +299,8 @@ public class MenuService {
 							}
 						}
 					}
-					pd.setExtras(extras);
-					productDataList.add(pd);
+					od.getProduct().setExtras(extras);
+					productDataList.add(od.getProduct());
 					extras = new ArrayList<Extra>();
 				}
 			}

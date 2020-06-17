@@ -2,7 +2,7 @@ package com.cdn.vanburga.model.request;
 
 import java.util.List;
 
-import com.cdn.vanburga.model.response.ProductData;
+import com.cdn.vanburga.model.Product;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ public class OrderRequest {
 	
 	private ClientReq client;
 
-	private List<ProductData> products;
+	private List<Product> products;
 
 	private String comment;
 	

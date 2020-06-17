@@ -5,6 +5,7 @@ import java.util.List;
 import com.cdn.vanburga.model.Address;
 import com.cdn.vanburga.model.Client;
 import com.cdn.vanburga.model.Order;
+import com.cdn.vanburga.model.Product;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +20,7 @@ public class OrderResponse extends BaseResponse{
 	
 	private Order order;
 	
-	private List<ProductData> orderDetail;
+	private List<Product> orderDetail;
 	
 	private List<Order> orders;
 	
