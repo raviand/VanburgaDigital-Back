@@ -38,7 +38,11 @@ public class Product {
 
 	private String code;
 	
+	private String color;
+	
 	private Boolean available;
+	
+	private Integer rawMaterial;
 	
 	@Transient
 	private List<Extra> extras;

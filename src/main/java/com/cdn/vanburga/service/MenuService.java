@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import com.cdn.vanburga.constant.OrderConstant;
 import com.cdn.vanburga.constant.ResponseCode;
 import com.cdn.vanburga.exception.FieldTypeException;
-import com.cdn.vanburga.exception.MissingFieldExcption;
+import com.cdn.vanburga.exception.MissingFieldException;
 import com.cdn.vanburga.exception.ServiceException;
 import com.cdn.vanburga.model.Address;
 import com.cdn.vanburga.model.Category;
@@ -162,7 +162,7 @@ public class MenuService {
 		logger.info("Creating order");
 		
 		try {
-			validateFields(orderRequest);
+			validateOrderRequestCreate(orderRequest);
 		
 		
 			//REGISTRA CLIENTE
@@ -231,7 +231,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
 			
-		} catch (MissingFieldExcption e1) {
+		} catch (MissingFieldException e1) {
 		
 			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -261,6 +261,9 @@ public class MenuService {
 		
 		logger.info("Updating order");
 		
+		try {
+			validateOrderRequestUpdate(orderRequest);
+		
 		Optional<Order> order = orderRepository.findById(orderRequest.getOrderId());
 		
 		if(!order.isPresent()) {
@@ -277,6 +280,29 @@ public class MenuService {
 		orderResponse.setCode(0);
 		orderResponse.setStatus(HttpStatus.OK.value());
 		
+		
+		} catch (MissingFieldException e1) {
+			
+			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
+			return HttpStatus.BAD_REQUEST;
+		
+		}catch (ServiceException e1) {
+			
+			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			return HttpStatus.BAD_REQUEST;
+			
+		} catch(Exception e) {
+		
+			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			return HttpStatus.BAD_REQUEST;
+			
+		}
 		return HttpStatus.OK;
 	}
 	
@@ -372,23 +398,40 @@ public class MenuService {
 	//***************************************************************************************************
 	//						V A L I D A C I O N E S
 	//***************************************************************************************************
-	private void validateFields(OrderRequest orderRequest) throws ServiceException{
+	private void validateOrderRequestCreate(OrderRequest orderRequest) throws ServiceException{
 
 		//valido todos los objetos obligatorios
-		if(orderRequest.getClient() == null) throw new MissingFieldExcption("Client missing").setDescriptionString("Client Object");
-		if(orderRequest.getProducts() == null) throw new MissingFieldExcption("Products missing").setDescriptionString("Products[] Object");
-		if(orderRequest.getClient().getAddress() == null) throw new MissingFieldExcption("Client.Address missing").setDescriptionString("Client.Address Object");
+		
+		if(orderRequest.getClient() == null) throw new MissingFieldException("Client missing").setDescriptionString("Client Object");
+		if(orderRequest.getClient().getName() == null) throw new MissingFieldException("Client missing mandatory fields").setDescriptionString("Client.Name Object");
+		if(orderRequest.getClient().getCellphone() == null) throw new MissingFieldException("Client missing mandatory fields").setDescriptionString("Client.Cellphone Object");
+		if(orderRequest.getClient().getLastName() == null) throw new MissingFieldException("Client missing mandatory fields").setDescriptionString("Client.LastName Object");
+		if(orderRequest.getClient().getMail() == null) throw new MissingFieldException("Client missing mandatory fields").setDescriptionString("Client.Mail Object");
+		if(orderRequest.getProducts() == null) throw new MissingFieldException("Products missing").setDescriptionString("Products[] Object");
+		if(orderRequest.getDelivery() == null) throw new MissingFieldException("Delivery missing").setDescriptionString("Delivery Object");
+		if(orderRequest.getDelivery()) {
+			if(orderRequest.getClient().getAddress() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
+			if(orderRequest.getClient().getAddress().getStreet() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
+			if(orderRequest.getClient().getAddress().getDoorNumber() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
+			if(orderRequest.getClient().getAddress().getZipCode() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
+			if(orderRequest.getClient().getAddress().getState() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
+		}
 		
 		
 	}
 	
+	private void validateOrderRequestUpdate(OrderRequest orderRequest) throws ServiceException {
+		if(orderRequest.getOrderStatus() == null) throw new MissingFieldException("OrderStatus missing").setDescriptionString("OrderStatus Object");
+		if(orderRequest.getOrderId() == null) throw new MissingFieldException("OrderId missing").setDescriptionString("OrderId Object");
+	}
+	
 	private void validateOrderSearch(String status, String dateFrom,String  dateTo, String clientId)throws ServiceException{
-		//Valido los campos obligatorios y el formato de cada campo
 		try {
 			if(clientId != null) new Long(clientId);
 		}catch(Exception e) {
 			throw new FieldTypeException("Must be a numeric value");
 		}
 	}
+
 	
 }

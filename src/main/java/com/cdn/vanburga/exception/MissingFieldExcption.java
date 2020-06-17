@@ -1,6 +1,6 @@
 package com.cdn.vanburga.exception;
 
-public class MissingFieldExcption extends ServiceException{
+public class MissingFieldException extends ServiceException{
 
 	/**
 	 * 
@@ -10,7 +10,7 @@ public class MissingFieldExcption extends ServiceException{
 	/**
      * Constructor for MissingObjectExcption.
      */
-    public MissingFieldExcption() {
+    public MissingFieldException() {
         super();
     }
 
@@ -18,7 +18,7 @@ public class MissingFieldExcption extends ServiceException{
      * Constructor for MissingObjectExcption.
      * @param _string
      */
-    public MissingFieldExcption(String _string) {
+    public MissingFieldException(String _string) {
         super(_string);
     }
 
@@ -26,7 +26,7 @@ public class MissingFieldExcption extends ServiceException{
      * Constructor for MissingObjectExcption.
      * @param _throwable
      */
-    public MissingFieldExcption(Throwable _throwable) {
+    public MissingFieldException(Throwable _throwable) {
         super(_throwable);
     }
 }
