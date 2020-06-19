@@ -10,11 +10,13 @@
 	</parent>
 	<groupId>com.cdn</groupId>
 	<artifactId>vanburga</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>vanburga</name>
-	<description>Demo project for Spring Boot</description>
+	<packaging>jar</packaging>
+	<description>Sistema de pedidos de hamburgueseria</description>
 
 	<properties>
+		<start-class>com.cdn.vanburga.VanburgaApplication</start-class>
 		<java.version>1.8</java.version>
 	</properties>
 
@@ -87,14 +89,33 @@
         
 </dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
+		
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+			 <groupId>org.springframework.boot</groupId>
+			 <artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+		      <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+		          <descriptors>
+		            <descriptor>src/main/assembly/descriptor.xml</descriptor>
+		          </descriptors>
+		        </configuration>
+		        <executions>
+		          <execution>
+		            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+		            <phase>package</phase> <!-- bind to the packaging phase -->
+		            <goals>
+		              <goal>single</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		  </plugin>
+
 		</plugins>
 	</build>
+
 
 </project>
