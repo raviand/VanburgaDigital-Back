@@ -179,7 +179,7 @@ INSERT INTO productByExtra(idProduct, idExtra) values (9, 4);
 INSERT INTO `Order`(idclient, comments, amount) values ('1','Haganme la hamburguesa con amor','420');
 INSERT INTO OrderDetail(idproduct,idorder) values ('1','1');
 INSERT INTO OrderDetail(idproduct,idorder) values ('2','1');
-INSERT INTO ExtraOrderDetail(idOrderDetail, idExtra) values ('1', '1');
+INSERT INTO ExtraOrderDetail(idOrderDetail, idExtra, quantity) values ('1', '1', '1');
 
 
 ##TABLAS Y DATOS PARA EL ENVÍO DE MAILS
@@ -198,8 +198,6 @@ insert into SystemProperty (propertyKey,name,oldValue,newValue,description) valu
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpAuthPassword','MailManager Contraseña Servidor SMTP','','','Contraseña de autenticacion del servidor SMTP para envío de mails.');
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpAuthRequired','MailManager Autenticacion SMTP','','false','Se requiere de autenticacion en servidor SMTP para envío de mails. Si el valor es true se valida el usuario y contraseña.');
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.smtpTls','MailManager Usa TLS SMTP','','false','Se enviará comando STARTTLS al servidor SMTP para envío de mails.');
-
-
 /*
 select ord.id, ord.delivery, ord.status, ord.comments, ord.createDate, ord.amount,
 cli.id as clientId, cli.name, cli.lastName, cli.cellphone, cli.mail,

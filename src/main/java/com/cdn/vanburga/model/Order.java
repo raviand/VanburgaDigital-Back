@@ -35,6 +35,8 @@ public class Order {
 	private Client client;
 	
 	private String comments;
+	
+	private Boolean delivery;
 
 	private String status;
 	

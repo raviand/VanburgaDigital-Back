@@ -20,6 +20,8 @@ public class OrderResponse extends BaseResponse{
 	
 	private Order order;
 	
+	private String whatsappLink;
+	
 	private List<Product> orderDetail;
 	
 	private List<Order> orders;

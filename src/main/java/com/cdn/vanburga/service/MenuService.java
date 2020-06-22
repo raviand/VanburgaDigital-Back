@@ -1,5 +1,6 @@
 package com.cdn.vanburga.service;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import com.cdn.vanburga.constant.OrderConstant;
 import com.cdn.vanburga.constant.ResponseCode;
@@ -212,6 +215,8 @@ public class MenuService {
 						ExtraOrderDetail extraOrder = new ExtraOrderDetail();
 						extraOrder.setExtra(e);
 						extraOrder.setOrderDetail(orderDetail);
+						//Temporal
+						extraOrder.setQuantity(1);
 						totalAmount = totalAmount.add(e.getPrice());
 						extraOrder = extraOrderDetailRepository.save(extraOrder);
 					}
@@ -220,6 +225,7 @@ public class MenuService {
 			//Registro el monto total del pedido
 			order.setAmount(totalAmount);
 			order.setStatus(OrderConstant.PENDING);
+			
 			order = orderRepository.save(order);
 			
 			
@@ -227,6 +233,9 @@ public class MenuService {
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
 			orderResponse.setOrderDetail(orderRequest.getProducts());
+			
+			//orderResponse.setWhatsappLink(createWhatsappLink(orderRequest.getClient().getCellphone(), "Mensaje de prueba"));
+			
 			orderResponse.setMessage(ResponseCode.OK.fieldName());
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
@@ -238,7 +247,14 @@ public class MenuService {
 			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
 			return HttpStatus.BAD_REQUEST;
 		
-		}catch (ServiceException e1) {
+		}/*catch (UnsupportedEncodingException e1) {
+		
+			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			return HttpStatus.BAD_REQUEST;
+		
+		}*/catch (ServiceException e1) {
 			
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -431,6 +447,13 @@ public class MenuService {
 		}catch(Exception e) {
 			throw new FieldTypeException("Must be a numeric value");
 		}
+	}
+	
+	private String createWhatsappLink(String phone, String message) throws UnsupportedEncodingException {
+		String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
+		String link = "https://wa.me/549"+phone+"/?text="+path;
+		
+		return link;
 	}
 
 	
