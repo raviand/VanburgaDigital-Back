@@ -9,6 +9,6 @@ public class BaseResponse {
 	
 	private Integer code;
 	
-	private String status;
+	private Integer status;
 	
 }

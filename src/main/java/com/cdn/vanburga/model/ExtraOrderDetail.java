@@ -1,5 +1,7 @@
 package com.cdn.vanburga.model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,13 +12,11 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 
 @Data
 @Entity
-public class Address {
+public class ExtraOrderDetail {
 
 	@Id
 	@GeneratedValue(
@@ -28,23 +28,13 @@ public class Address {
 	        strategy = "native")
 	private Long id;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idClient", referencedColumnName = "id")
-	@JsonIgnore
-	private Client client;
+	private Integer quantity;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idState", referencedColumnName = "id")
-	private State state;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
+    @JoinColumn(name = "idOrderDetail", referencedColumnName = "id")
+	private OrderDetail orderDetail;
 	
-	private String street;
-	
-	private String doorNumber;
-	
-	private String zipCode;
-	
-	private String floor;
-	
-	private String door;
-	
+	@ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
+    @JoinColumn(name = "idExtra", referencedColumnName = "id")
+	private Extra extra;
 }

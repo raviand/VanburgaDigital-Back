@@ -7,18 +7,19 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Category {
+public class SystemProperty {
 
 	@Id
-	private Long id;
+	private Integer id;
+	
+	private String propertyKey;
 	
 	private String name;
 	
+	private String oldValue;
+	
+	private String newValue;
+	
 	private String description;
 	
-	public Category(Long id) {
-		this.id=id;
-	}
-	
-	public Category () {}
 }

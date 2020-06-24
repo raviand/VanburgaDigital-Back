@@ -1,0 +1,73 @@
+{
+	"client" : {
+		"name" : "Ramiro",
+		"cellphone" : "15-6892-9067",
+		"lastName" : "Videla",
+		"mail" : "Raviand86@Gmail.com",
+		"address" : {
+			"street" : "Perito Moreno",
+			"doorNumber" : "1151",
+			"zipCode" : "1648",
+			"state" : 1
+		}
+	},
+	"comment" : "Dejar el pedido en la puerta roja que tiene un dragon dibujado... no, no vendemos droga",
+	"products" : [
+		{
+			"product" : {
+				"id":1,
+				"name" : "Vanburga Bacon XL",
+				"category" : {
+					"id":1,
+					"name" : "Burgas",
+					"description":"Las mejores hamburguesas para que disfrutes con la concha de tu hermana!"
+				},
+				"price" : 300.00,
+				"description" : "Doble carne, doble cheddar y mucho bacon"
+			},
+			"extras" : [{
+				"id":1,
+				"name" : "Extra cheddar",
+				"price" : 40.00
+			},
+			{
+				"id":2,
+				"name" : "Extra bacon",
+				"price" : 40.00
+			}
+			]
+		},
+		{
+			"product" : {
+				"id":1,
+				"category" : {
+					"id":1,
+					"name" : "Burgas",
+					"description":"Las mejores hamburguesas para que disfrutes con la concha de tu hermana!"
+				},
+				"name" : "Vanburga Bacon XL",
+				"price" : 300.00,
+				"description" : "Doble carne, doble cheddar y mucho bacon"
+			},
+			"extras" : [{
+				"id":1,
+				"name" : "Extra cheddar",
+				"price" : 40.00
+			}
+			]
+		},
+		{
+			"product" : {
+				"id":2,
+				"category" : {
+					"id":2,
+					"name" : "Bebidas",
+					"description":"Pedite una birra para disfrutar con tu Vanburga"
+				},
+				"name" : "Cerveza Andes IPA",
+				"price" : 80.00,
+				"description" : "IPA rubia"
+			}			
+		}
+	]
+}

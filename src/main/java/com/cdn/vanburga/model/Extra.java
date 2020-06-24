@@ -16,7 +16,13 @@ public class Extra {
 	
 	private String name;
 	
+	private String code;
+	
 	private BigDecimal price;
+	
+	private Integer rawMaterial;
+	
+	private Integer quantityLimit;
 	
 	private Boolean available;
 	
