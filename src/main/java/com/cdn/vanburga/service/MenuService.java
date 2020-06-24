@@ -234,35 +234,35 @@ public class MenuService {
 			orderResponse.setOrder(order);
 			orderResponse.setOrderDetail(orderRequest.getProducts());
 			
-			//orderResponse.setWhatsappLink(createWhatsappLink(orderRequest.getClient().getCellphone(), "Mensaje de prueba"));
+			orderResponse.setWhatsappLink(createWhatsappLink(orderRequest.getClient().getCellphone(), "Mensaje de prueba"));
 			
 			orderResponse.setMessage(ResponseCode.OK.fieldName());
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
 			
 		} catch (MissingFieldException e1) {
-		
+			logger.error("error: ", e1);
 			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
 			return HttpStatus.BAD_REQUEST;
 		
-		}/*catch (UnsupportedEncodingException e1) {
+		}catch (UnsupportedEncodingException e1) {
 		
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
 			return HttpStatus.BAD_REQUEST;
 		
-		}*/catch (ServiceException e1) {
-			
+		}catch (ServiceException e1) {
+			logger.error("error: ", e1);
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
 			return HttpStatus.BAD_REQUEST;
 			
 		} catch(Exception e) {
-		
+			logger.error("error: ", e);
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());

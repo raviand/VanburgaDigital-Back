@@ -64,6 +64,7 @@ id INT PRIMARY KEY,
 code varchar(50) null unique,
 name VARCHAR(150) NOT NULL,
 rawMaterial INT DEFAULT 0,
+color varchar(10),
 quantityLimit INT DEFAULT 1,
 price DECIMAL(13,2) NOT NULL,
 available BOOLEAN DEFAULT TRUE
