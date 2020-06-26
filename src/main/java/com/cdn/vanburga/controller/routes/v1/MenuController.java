@@ -10,15 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cdn.vanburga.controller.routes.MenuControllerInterface;
 import com.cdn.vanburga.model.State;
+import com.cdn.vanburga.model.User;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
 import com.cdn.vanburga.service.MenuService;
+import com.cdn.vanburga.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,6 +42,8 @@ public class MenuController implements MenuControllerInterface{
 	@Autowired
 	private MenuService menuService;
 	
+	@Autowired
+	private UserService userService;
 	
 	public ResponseEntity<List<State>> getState(HttpServletRequest request){
 
@@ -136,6 +141,22 @@ public class MenuController implements MenuControllerInterface{
 		
 		return ResponseEntity.status(httpStatus).body(orderResponse);
 	
+	}
+	
+	public ResponseEntity<User> createUser(User user, HttpServletRequest httpRequest){
+		
+		ObjectMapper Obj = new ObjectMapper();
+		try {
+			logger.info("recive: " + Obj.writerWithDefaultPrettyPrinter().writeValueAsString(user));
+			
+			HttpStatus status = userService.registerUser(user);
+			
+			return ResponseEntity.status(status).body(user);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new User());
 	}
 
 }

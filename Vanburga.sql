@@ -116,6 +116,30 @@ FOREIGN KEY(idExtra)
 		REFERENCES Extra(id)
 );
 
+CREATE TABLE IF NOT EXISTS User(
+id 			INT AUTO_INCREMENT PRIMARY KEY,
+loginId		varchar(100) NULL,
+name 		VARCHAR(70) NOT NULL,
+email  		VARCHAR(100) NULL,
+provider 	varchar(100)NULL,
+providerId 	varchar (100) NULL,
+imageUrl 	varchar(500) NULL,
+token 		varchar (500) NULL,
+idToken 	varchar(1500) NULL
+);
+
+
+##TABLAS Y DATOS PARA EL ENVÍO DE MAILS
+CREATE TABLE IF NOT EXISTS SystemProperty(
+id INT PRIMARY KEY auto_increment NOT NULL,
+propertyKey varchar(50) NOT NULL,
+name varchar(50) not null,
+oldValue  varchar(50) not null,
+newValue  varchar(50) not null,
+description  varchar(150) not null
+);
+
+
 ##TABLE'S POPULATION
 INSERT INTO category(name, description) values ('Burgers','Las mejores del condado');
 INSERT INTO category(name, description) values ('Bebidas','Tomate una fresca');
@@ -140,6 +164,7 @@ INSERT INTO product(id, name, idcategory, price, description, code) values (6, '
 INSERT INTO product(id, name, idcategory, price, description, code) values (7, 'Oklahoma','1','400','Doble carne Smasheada con cebolla, Doble cheddar', 'H-O');
 INSERT INTO product(id, name, idcategory, price, description, code) values (8, 'Sweet Onion','1','400','Doble carne, Doble cheddar, Cebolla caramelizada, , Bacon crocante', 'H-SO');
 INSERT INTO product(id, name, idcategory, price, description, code) values (9, 'Smoke Shack','1','400','Doble carne, Doble Emmenthal, Bacon crocante, Morrones bañados con tabasco, Salsita Shake Shack', 'H-SS');
+INSERT INTO product(id, name, idcategory, price, description, code) values (10, 'Burga','1','400','VER DE QUE CONSTA LA BURGA... SOLO BURGA', 'H-B');
 INSERT INTO extra(id, name, price, code) values (1, 'Extra Cheddar','50', 'E-CH');
 INSERT INTO extra(id, name, price, code) values (2, 'Extra Bacon','50' , 'E-BA');
 INSERT INTO extra(id, name, price, code) values (3, 'Extra Medallón','50', 'E-ME');
@@ -179,18 +204,10 @@ INSERT INTO productByExtra(idProduct, idExtra) values (9, 4);
 INSERT INTO `Order`(idclient, comments, amount) values ('1','Haganme la hamburguesa con amor','420');
 INSERT INTO OrderDetail(idproduct,idorder) values ('1','1');
 INSERT INTO OrderDetail(idproduct,idorder) values ('2','1');
-INSERT INTO ExtraOrderDetail(idOrderDetail, idExtra) values ('1', '1');
+INSERT INTO ExtraOrderDetail(idOrderDetail, idExtra, quantity) values ('1', '1', 1);
 
 
-##TABLAS Y DATOS PARA EL ENVÍO DE MAILS
-CREATE TABLE IF NOT EXISTS SystemProperty(
-id INT PRIMARY KEY auto_increment NOT NULL,
-propertyKey varchar(50) NOT NULL,
-name varchar(50) not null,
-oldValue  varchar(50) not null,
-newValue  varchar(50) not null,
-description  varchar(150) not null
-);
+
 
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.hostNameString','MailManager Servidor SMTP','','localhost','Dirección IP o nombre del servidor SMTP para envío de mails.');
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.portString','MailManager Puerto del Servidor SMTP','','25','Puerto del servidor SMTP para envío de mails.');

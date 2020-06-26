@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cdn.vanburga.model.State;
+import com.cdn.vanburga.model.User;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
@@ -65,5 +66,6 @@ public interface MenuControllerInterface {
 	@PutMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<OrderResponse> updateOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest httpRequest); 
 	
-	
+	@PostMapping(path = "/user", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+	public ResponseEntity<User> createUser(@RequestBody User user, HttpServletRequest httpRequest); 
 }
