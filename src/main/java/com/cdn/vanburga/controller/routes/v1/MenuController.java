@@ -20,8 +20,10 @@ import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
+import com.cdn.vanburga.model.response.UserResponse;
 import com.cdn.vanburga.service.MenuService;
 import com.cdn.vanburga.service.UserService;
+import com.cdn.vanburga.util.ServiceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -143,20 +145,17 @@ public class MenuController implements MenuControllerInterface{
 	
 	}
 	
-	public ResponseEntity<User> createUser(User user, HttpServletRequest httpRequest){
+	public ResponseEntity<UserResponse> createUser(User user, HttpServletRequest httpRequest){
 		
-		ObjectMapper Obj = new ObjectMapper();
-		try {
-			logger.info("recive: " + Obj.writerWithDefaultPrettyPrinter().writeValueAsString(user));
-			
-			HttpStatus status = userService.registerUser(user);
-			
-			return ResponseEntity.status(status).body(user);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new User());
+		
+		logger.info("recive: " + ServiceUtils.objectToJson(user));
+		UserResponse userResponse = new UserResponse();
+		HttpStatus status = userService.registerUser(user, userResponse);
+		
+		logger.info("return: " + ServiceUtils.objectToJson(userResponse));
+		return ResponseEntity.status(status).body(userResponse);
+		
+		
 	}
 
 }

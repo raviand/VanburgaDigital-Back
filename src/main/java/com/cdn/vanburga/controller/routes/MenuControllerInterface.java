@@ -20,6 +20,7 @@ import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
+import com.cdn.vanburga.model.response.UserResponse;
 
 
 
@@ -67,5 +68,5 @@ public interface MenuControllerInterface {
 	public ResponseEntity<OrderResponse> updateOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest httpRequest); 
 	
 	@PostMapping(path = "/user", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
-	public ResponseEntity<User> createUser(@RequestBody User user, HttpServletRequest httpRequest); 
+	public ResponseEntity<UserResponse> createUser(@RequestBody User user, HttpServletRequest httpRequest); 
 }

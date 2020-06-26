@@ -28,5 +28,7 @@ public class User {
 	private String image;
 	private String token;
 	private String idToken;
+	private String password;
+	private String phone;
 	
 }

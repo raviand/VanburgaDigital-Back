@@ -125,7 +125,9 @@ provider 	varchar(100)NULL,
 providerId 	varchar (100) NULL,
 imageUrl 	varchar(500) NULL,
 token 		varchar (500) NULL,
-idToken 	varchar(1500) NULL
+idToken 	varchar(1500) NULL,
+password 	varchar(100) Null,
+phone		varchar(100) Null
 );
 
 

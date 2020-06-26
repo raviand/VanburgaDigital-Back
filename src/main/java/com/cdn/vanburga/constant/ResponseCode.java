@@ -30,15 +30,15 @@ public enum ResponseCode {
 	
 	DATE_FORMAT_ERROR(16, "Wrong Date format"),
 	
-	//WRONG_COMPANY_OR_STORE(17, "Merchant Code or merchant store code does not exist"),
+	USER_MAIL_ALREADY_REGISTERED(17, "Mail already Registered"),
 	
 	MISSING_FIELD(18, "Missing mandatory field: "),
 	
-	//MERCHANT_ORDER_ALREADY_EXIST(19, "MerchantOrderId value already exist"),
+	WRONG_PASSWORD(19, "Wrong password"),
 	
 	INVALID_FORMAT(20, "Invalid field format"),
 	
-	//INVALID_PAYMENT_METHOD(21, "Invalid Payment Method"),
+	USER_NOT_EXIST(21, "User is not register"),
 	
 	INVALID_STATUS(22, "Can not execute the operation with the actual status"),
 	
