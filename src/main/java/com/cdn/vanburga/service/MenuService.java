@@ -175,17 +175,19 @@ public class MenuService {
 			
 			//Registra la direccion
 			Address address = new Address();
-			address.setClient(client);
-			address.setDoor(orderRequest.getClient().getAddress().getDoor());
-			address.setDoorNumber(orderRequest.getClient().getAddress().getDoorNumber());
-			address.setFloor(orderRequest.getClient().getAddress().getFloor());
-			if(stateList == null || stateList.isEmpty()) {
-				this.stateList = stateRepository.findAll();
+			if(orderRequest.getDelivery().booleanValue()) {				
+				address.setClient(client);
+				address.setDoor(orderRequest.getClient().getAddress().getDoor());
+				address.setDoorNumber(orderRequest.getClient().getAddress().getDoorNumber());
+				address.setFloor(orderRequest.getClient().getAddress().getFloor());
+				if(stateList == null || stateList.isEmpty()) {
+					this.stateList = stateRepository.findAll();
+				}
+				address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
+				address.setStreet(orderRequest.getClient().getAddress().getStreet());
+				address.setZipCode(orderRequest.getClient().getAddress().getZipCode());
+				address = addressRepository.save(address);
 			}
-			address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
-			address.setStreet(orderRequest.getClient().getAddress().getStreet());
-			address.setZipCode(orderRequest.getClient().getAddress().getZipCode());
-			address = addressRepository.save(address);
 			
 			//Crea la orden de pedido
 			Order order = new Order();
@@ -212,6 +214,7 @@ public class MenuService {
 						ExtraOrderDetail extraOrder = new ExtraOrderDetail();
 						extraOrder.setExtra(e);
 						extraOrder.setOrderDetail(orderDetail);
+						extraOrder.setQuantity(1);
 						totalAmount = totalAmount.add(e.getPrice());
 						extraOrder = extraOrderDetailRepository.save(extraOrder);
 					}
