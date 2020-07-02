@@ -142,6 +142,7 @@ description  varchar(150) not null
 );
 
 
+
 ##TABLE'S POPULATION
 INSERT INTO category(name, description) values ('Burgers','Las mejores del condado');
 INSERT INTO category(name, description) values ('Bebidas','Tomate una fresca');
@@ -158,19 +159,19 @@ INSERT INTO client(name, lastName, cellphone, mail) values ('Nico','Rohland','11
 INSERT INTO address(idclient, idstate, street, doorNumber, zipcode) values ('1','1','Los Alamos','895', '1667');
 INSERT INTO address(idclient, idstate, street, doorNumber, zipcode) values ('2','3','Las Amapolas','123' , '1667');
 INSERT INTO product(id, name, idcategory, price, description, code) values (1, 'Cerveza Andes IPA','2','80','IPA rubia', 'B-CAI');
-INSERT INTO product(id, name, idcategory, price, description, code) values (2, 'Cuarto Vanburga','1','400','Doble carne, Doble cheddar, Cebolla cortada, Ketchup Heinz, Mostaza Heinz', 'H-CV');
-INSERT INTO product(id, name, idcategory, price, description, code) values (3, 'Clásica','1','400','Doble carne, Doble cheddar, Cebolla cruda, Tomate, Lechuga, Pickles de pepino, Salsa Vanburga', 'H-C');
-INSERT INTO product(id, name, idcategory, price, description, code) values (4, 'Cheeseburger','1','400','Triple carne, Sextuple cheddar, Bacon crocante', 'H-CHB');
-INSERT INTO product(id, name, idcategory, price, description, code) values (5, 'Argenta','1','400','Doble carne, Doble provoleta, Chimichurri de la Abuela', 'H-A');
-INSERT INTO product(id, name, idcategory, price, description, code) values (6, 'Crispy Onion','1','400','Doble carne, Doble cheddar, Cebolla crocante, Bacon crocante, Salsa Vanburga', 'H-CO');
-INSERT INTO product(id, name, idcategory, price, description, code) values (7, 'Oklahoma','1','400','Doble carne Smasheada con cebolla, Doble cheddar', 'H-O');
-INSERT INTO product(id, name, idcategory, price, description, code) values (8, 'Sweet Onion','1','400','Doble carne, Doble cheddar, Cebolla caramelizada, , Bacon crocante', 'H-SO');
-INSERT INTO product(id, name, idcategory, price, description, code) values (9, 'Smoke Shack','1','400','Doble carne, Doble Emmenthal, Bacon crocante, Morrones bañados con tabasco, Salsita Shake Shack', 'H-SS');
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (2, 'Cuarto Vanburga','1','400','Doble carne, Doble cheddar, Cebolla cortada, Ketchup Heinz, Mostaza Heinz', 'H-CV', 2);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (3, 'Clásica','1','400','Doble carne, Doble cheddar, Cebolla cruda, Tomate, Lechuga, Pickles de pepino, Salsa Vanburga', 'H-C', 2);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (4, 'Cheeseburger','1','400','Triple carne, Sextuple cheddar, Bacon crocante', 'H-CHB', 3);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (5, 'Argenta','1','400','Doble carne, Doble provoleta, Chimichurri de la Abuela', 'H-A', 2);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (6, 'Crispy Onion','1','400','Doble carne, Doble cheddar, Cebolla crocante, Bacon crocante, Salsa Vanburga', 'H-CO', 2);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (7, 'Oklahoma','1','400','Doble carne Smasheada con cebolla, Doble cheddar', 'H-O', 2);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (8, 'Sweet Onion','1','400','Doble carne, Doble cheddar, Cebolla caramelizada, , Bacon crocante', 'H-SO', 2);
+INSERT INTO product(id, name, idcategory, price, description, code, rawMaterial) values (9, 'Smoke Shack','1','400','Doble carne, Doble Emmenthal, Bacon crocante, Morrones bañados con tabasco, Salsita Shake Shack', 'H-SS', 2);
 INSERT INTO product(id, name, idcategory, price, description, code) values (10, 'Burga','1','400','VER DE QUE CONSTA LA BURGA... SOLO BURGA', 'H-B');
-INSERT INTO extra(id, name, price, code) values (1, 'Extra Cheddar','50', 'E-CH');
-INSERT INTO extra(id, name, price, code) values (2, 'Extra Bacon','50' , 'E-BA');
-INSERT INTO extra(id, name, price, code) values (3, 'Extra Medallón','50', 'E-ME');
-INSERT INTO extra(id, name, price, code) values (4, 'Extra papas con Cheddar y Bacon','50', 'E-PCB');
+INSERT INTO extra(id, name, price, code, quantityLimit) values (1, 'Extra Cheddar','50', 'E-CH', 1);
+INSERT INTO extra(id, name, price, code, quantityLimit) values (2, 'Extra Bacon','50' , 'E-BA', 1);
+INSERT INTO extra(id, name, price, code, rawMaterial, quantityLimit) values (3, 'Extra Medallón','50', 'E-ME', 1, 4);
+INSERT INTO extra(id, name, price, code, quantityLimit) values (4, 'Extra papas con Cheddar y Bacon','50', 'E-PCB', 1);
 INSERT INTO productByExtra(idProduct, idExtra) values (2, 1);
 INSERT INTO productByExtra(idProduct, idExtra) values (2, 2);
 INSERT INTO productByExtra(idProduct, idExtra) values (2, 3);
@@ -236,7 +237,7 @@ left join product as prod on prod.id=odet.idproduct
 left join extraorderdetail as extd on extd.idorderdetail=odet.id
 left join extra as ext on ext.id=extd.idextra
 
-where ord.id=1; */
+where ord.id=11; */
 
 
 ##VANBERGA INC. TODOS LOS DERECHOS RESERVADOS
