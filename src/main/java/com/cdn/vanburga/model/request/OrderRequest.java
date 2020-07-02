@@ -17,7 +17,7 @@ public class OrderRequest {
 	
 	private Long orderId;
 	
-	private String orderStatus;
+	private String status;
 	
 	private Boolean delivery;
 	

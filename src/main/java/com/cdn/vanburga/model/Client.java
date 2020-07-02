@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -33,5 +34,8 @@ public class Client {
 	private String cellphone;
 	
 	private String mail;
+	
+	@Transient
+	private Address address;
 	
 }

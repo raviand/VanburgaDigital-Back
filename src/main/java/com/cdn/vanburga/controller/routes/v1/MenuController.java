@@ -119,10 +119,11 @@ public class MenuController implements MenuControllerInterface{
 	@Override
 	public ResponseEntity<OrderResponse> updateOrder(OrderRequest orderRequest, HttpServletRequest request) {//Es necesario que llegue orderrequest?
 
+		logger.info("recive: " + ServiceUtils.objectToJson(orderRequest));
 		OrderResponse orderResponse = new OrderResponse(); 
 		
 		HttpStatus status = menuService.updateOrder(orderRequest, orderResponse);
-		
+		logger.info("return: " + ServiceUtils.objectToJson(orderResponse));
 		return ResponseEntity.status(status).body(orderResponse);
 	}
 	

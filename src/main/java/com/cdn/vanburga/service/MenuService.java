@@ -229,7 +229,7 @@ public class MenuService {
 			//Formo la respuesta del servicio
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
-			orderResponse.setOrderDetail(orderRequest.getProducts());
+			orderResponse.setProdcts(orderRequest.getProducts());
 			orderResponse.setMessage(ResponseCode.OK.fieldName());
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
@@ -276,7 +276,7 @@ public class MenuService {
 			return HttpStatus.NOT_FOUND;
 		}
 		//TODO: Validar que el cambio de estado sea correcto. no podemos pasar de "canceled" a "Done" entre otras convinetas
-		order.get().setStatus(orderRequest.getOrderStatus());
+		order.get().setStatus(orderRequest.getStatus());
 		
 		orderResponse.setOrder(orderRepository.save(order.get()));
 		orderResponse.setMessage("Order updated");
@@ -334,8 +334,8 @@ public class MenuService {
 				}
 			}
 			orderResponse.setOrder(order.get());
-			orderResponse.setAddress(address.get());
-			orderResponse.setOrderDetail(productDataList);
+			if(address.isPresent()) orderResponse.setAddress(address.get());
+			orderResponse.setProdcts(productDataList);
 			
 		}else {
 			orderResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
@@ -424,7 +424,7 @@ public class MenuService {
 	}
 	
 	private void validateOrderRequestUpdate(OrderRequest orderRequest) throws ServiceException {
-		if(orderRequest.getOrderStatus() == null) throw new MissingFieldException("OrderStatus missing").setDescriptionString("OrderStatus Object");
+		if(orderRequest.getStatus() == null) throw new MissingFieldException("OrderStatus missing").setDescriptionString("OrderStatus Object");
 		if(orderRequest.getOrderId() == null) throw new MissingFieldException("OrderId missing").setDescriptionString("OrderId Object");
 	}
 	
