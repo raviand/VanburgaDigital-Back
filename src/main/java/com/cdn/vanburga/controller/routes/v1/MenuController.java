@@ -93,10 +93,11 @@ public class MenuController implements MenuControllerInterface{
 		try {
 			OrderResponse orderResponse = new OrderResponse();
 			ObjectMapper Obj = new ObjectMapper();
-			logger.info("recive: " + Obj.writerWithDefaultPrettyPrinter().writeValueAsString(orderRequest));
+			logger.info("request: " + Obj.writerWithDefaultPrettyPrinter().writeValueAsString(orderRequest));
 		
 			HttpStatus status = menuService.createOrder(orderRequest, orderResponse);
 			
+			logger.info("response: " + ServiceUtils.objectToJson(orderResponse));
 			return ResponseEntity.status(status).body(orderResponse);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
@@ -119,11 +120,22 @@ public class MenuController implements MenuControllerInterface{
 	@Override
 	public ResponseEntity<OrderResponse> updateOrder(OrderRequest orderRequest, HttpServletRequest request) {//Es necesario que llegue orderrequest?
 
-		logger.info("recive: " + ServiceUtils.objectToJson(orderRequest));
+		logger.info("request: " + ServiceUtils.objectToJson(orderRequest));
 		OrderResponse orderResponse = new OrderResponse(); 
 		
 		HttpStatus status = menuService.updateOrder(orderRequest, orderResponse);
-		logger.info("return: " + ServiceUtils.objectToJson(orderResponse));
+		logger.info("response: " + ServiceUtils.objectToJson(orderResponse));
+		return ResponseEntity.status(status).body(orderResponse);
+	}
+	
+	@Override
+	public ResponseEntity<OrderResponse> cancelOrder(OrderRequest orderRequest, HttpServletRequest request) {//Es necesario que llegue orderrequest?
+
+		logger.info("request: " + ServiceUtils.objectToJson(orderRequest));
+		OrderResponse orderResponse = new OrderResponse(); 
+		
+		HttpStatus status = menuService.cancelOrder(orderRequest, orderResponse);
+		logger.info("response: " + ServiceUtils.objectToJson(orderResponse));
 		return ResponseEntity.status(status).body(orderResponse);
 	}
 	
@@ -149,11 +161,11 @@ public class MenuController implements MenuControllerInterface{
 	public ResponseEntity<UserResponse> createUser(User user, HttpServletRequest httpRequest){
 		
 		
-		logger.info("recive: " + ServiceUtils.objectToJson(user));
+		logger.info("request: " + ServiceUtils.objectToJson(user));
 		UserResponse userResponse = new UserResponse();
 		HttpStatus status = userService.registerUser(user, userResponse);
 		
-		logger.info("return: " + ServiceUtils.objectToJson(userResponse));
+		logger.info("response: " + ServiceUtils.objectToJson(userResponse));
 		return ResponseEntity.status(status).body(userResponse);
 		
 		

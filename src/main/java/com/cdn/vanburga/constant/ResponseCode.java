@@ -60,7 +60,7 @@ public enum ResponseCode {
 
 	EMAIL_FORMAT_ERROR(31, "Email field does not have the right format" ),
 	
-	//MERCHANT_ORIGIN_ERROR(32, "The merchant code does not correspond to the transaction" ),
+	LOGIN_ERROR(32, "The username or password are wrong" ),
 	
 	MAIL_ERROR(33, "Error sending email to customer" ),
 

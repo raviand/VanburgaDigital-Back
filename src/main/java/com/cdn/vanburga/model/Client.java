@@ -1,9 +1,13 @@
 package com.cdn.vanburga.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -37,5 +41,9 @@ public class Client {
 	
 	@Transient
 	private Address address;
+	
+	@OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+	private User user;
 	
 }

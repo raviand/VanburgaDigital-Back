@@ -62,8 +62,8 @@ public class UserService {
 						String enteredPassword = user.getPassword() != null ? new String( Base64.getDecoder().decode(user.getPassword())) : null;
 						if(!registerPassword.equals(enteredPassword)) {
 							//ERROR en Password, no son iguales
-							userResponse.setCode(ResponseCode.WRONG_PASSWORD.fieldNumber());
-							userResponse.setMessage(ResponseCode.WRONG_PASSWORD.fieldName());
+							userResponse.setCode(ResponseCode.LOGIN_ERROR.fieldNumber());
+							userResponse.setMessage(ResponseCode.LOGIN_ERROR.fieldName());
 							userResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 							
 							return HttpStatus.BAD_REQUEST;
@@ -80,8 +80,8 @@ public class UserService {
 			}
 			if(user.getName() == null) {
 				//ERROR!!!! el mail no esta registrado y no es un alta
-				userResponse.setCode(ResponseCode.USER_NOT_EXIST.fieldNumber());
-				userResponse.setMessage(ResponseCode.USER_NOT_EXIST.fieldName());
+				userResponse.setCode(ResponseCode.LOGIN_ERROR.fieldNumber());
+				userResponse.setMessage(ResponseCode.LOGIN_ERROR.fieldName());
 				userResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 				return HttpStatus.BAD_REQUEST;
 			}

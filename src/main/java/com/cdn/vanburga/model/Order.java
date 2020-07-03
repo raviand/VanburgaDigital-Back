@@ -42,4 +42,6 @@ public class Order {
 	
 	private BigDecimal amount;
 	
+	private Boolean delivery;
+	
 }

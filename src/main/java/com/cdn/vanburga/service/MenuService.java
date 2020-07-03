@@ -45,6 +45,9 @@ import com.cdn.vanburga.repository.ProductExtraRepository;
 import com.cdn.vanburga.repository.ProductRepository;
 import com.cdn.vanburga.repository.StateRepository;
 import com.cdn.vanburga.util.LocalDateTimeAttributeConverter;
+import com.mysql.cj.Constants;
+
+import jdk.internal.jline.internal.Log;
 
 @Service
 public class MenuService {
@@ -86,7 +89,7 @@ public class MenuService {
 		response.setStatus(HttpStatus.OK.value());
 		response.setCode(ResponseCode.FOUND.fieldNumber());
 		response.setMessage(ResponseCode.FOUND.fieldName());
-		
+		logger.debug("Response: " + response.toString());
 		return HttpStatus.OK;
 		
 	}
@@ -151,7 +154,6 @@ public class MenuService {
 		response.setStatus(HttpStatus.NOT_FOUND.value());
 		response.setCode(ResponseCode.NOT_FOUND.fieldNumber());
 		response.setMessage(ResponseCode.NOT_FOUND.fieldName());
-		
 		return HttpStatus.NOT_FOUND;
 		
 	}
@@ -234,11 +236,13 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
 			
+			
 		} catch (MissingFieldException e1) {
 		
 			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
+			logger.error("MissingFieldException: " + e1.getDescriptionString());
 			return HttpStatus.BAD_REQUEST;
 		
 		}catch (ServiceException e1) {
@@ -246,6 +250,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			logger.error("ServiceException: " + e1.getDescriptionString());
 			return HttpStatus.BAD_REQUEST;
 			
 		} catch(Exception e) {
@@ -253,6 +258,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			logger.error("Exception: " + e.getMessage());
 			return HttpStatus.BAD_REQUEST;
 			
 		}
@@ -266,8 +272,10 @@ public class MenuService {
 		
 		try {
 			validateOrderRequestUpdate(orderRequest);
+			
 		
 		Optional<Order> order = orderRepository.findById(orderRequest.getOrderId());
+		
 		
 		if(!order.isPresent()) {
 			orderResponse.setMessage("Order not found");
@@ -275,10 +283,18 @@ public class MenuService {
 			orderResponse.setStatus(HttpStatus.NOT_FOUND.value());
 			return HttpStatus.NOT_FOUND;
 		}
-		//TODO: Validar que el cambio de estado sea correcto. no podemos pasar de "canceled" a "Done" entre otras convinetas
-		order.get().setStatus(orderRequest.getStatus());
 		
-		orderResponse.setOrder(orderRepository.save(order.get()));
+		//Validación de status
+		if(!validateOrderStatus(orderRequest, order.get())) {
+			logger.info("Current order status: "+ order.get().getStatus() + " updating to: " + orderRequest.getStatus());
+			orderResponse.setMessage("Invalid order status: cannot update from " + order.get().getStatus() + " to " + orderRequest.getStatus());
+			orderResponse.setCode(400);
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			return HttpStatus.BAD_REQUEST;
+		}
+		order.get().setStatus(orderRequest.getStatus());
+		orderRepository.save(order.get());
+		orderResponse.setOrder(order.get());
 		orderResponse.setMessage("Order updated");
 		orderResponse.setCode(0);
 		orderResponse.setStatus(HttpStatus.OK.value());
@@ -289,6 +305,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
+			logger.error("MissingFieldException: " + e1.getDescriptionString());
 			return HttpStatus.BAD_REQUEST;
 		
 		}catch (ServiceException e1) {
@@ -296,6 +313,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			logger.error("ServiceException: " + e1.getDescriptionString());
 			return HttpStatus.BAD_REQUEST;
 			
 		} catch(Exception e) {
@@ -303,6 +321,69 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			logger.error("Exception: " + e.getMessage());
+			return HttpStatus.BAD_REQUEST;
+			
+		}
+		return HttpStatus.OK;
+	}
+	
+public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResponse) {
+		
+		logger.info("Cancelling order");
+		
+		try {
+			validateOrderRequestUpdate(orderRequest);
+			
+		
+		Optional<Order> order = orderRepository.findById(orderRequest.getOrderId());
+		
+		
+		if(!order.isPresent()) {
+			orderResponse.setMessage("Order not found");
+			orderResponse.setCode(404);
+			orderResponse.setStatus(HttpStatus.NOT_FOUND.value());
+			return HttpStatus.NOT_FOUND;
+		}
+		
+		if(!orderRequest.getStatus().equals(OrderConstant.CANCELLED)) {
+			logger.error("Current order status: "+ order.get().getStatus() + ". This endpoint is to CANCEL an order.");
+			orderResponse.setMessage("Invalid order status: cannot update from " + order.get().getStatus() + " to " + orderRequest.getStatus());
+			orderResponse.setCode(400);
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			return HttpStatus.BAD_REQUEST;
+		}
+		
+		order.get().setStatus(OrderConstant.CANCELLED);
+		orderRepository.save(order.get());
+		orderResponse.setOrder(order.get());
+		orderResponse.setMessage("Order updated");
+		orderResponse.setCode(0);
+		orderResponse.setStatus(HttpStatus.OK.value());
+		
+		
+		} catch (MissingFieldException e1) {
+			
+			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
+			logger.error("MissingFieldException: " + e1.getDescriptionString());
+			return HttpStatus.BAD_REQUEST;
+		
+		}catch (ServiceException e1) {
+			
+			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			logger.error("ServiceException: " + e1.getDescriptionString());
+			return HttpStatus.BAD_REQUEST;
+			
+		} catch(Exception e) {
+		
+			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
+			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
+			logger.error("Exception: " + e.getMessage());
 			return HttpStatus.BAD_REQUEST;
 			
 		}
@@ -310,6 +391,8 @@ public class MenuService {
 	}
 	
 	public HttpStatus getOrder(Long orderId, OrderResponse orderResponse) {
+		logger.info("Getting order");
+		logger.debug("Getting id: " + orderId.toString());
 		
 		Optional<Order> order = orderRepository.findById(orderId);
 		
@@ -341,6 +424,7 @@ public class MenuService {
 			orderResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
 			orderResponse.setCode(ResponseCode.NOT_FOUND.fieldNumber());
 			orderResponse.setStatus(HttpStatus.NOT_FOUND.value());
+			logger.warn("Order not found");
 			return HttpStatus.NOT_FOUND;
 		}
 		
@@ -354,6 +438,7 @@ public class MenuService {
 			String dateFrom,
 			String dateTo,  
 			String clientId,OrderResponse orderResponse) {
+		logger.info("Finding orders for status " + status + " between " + dateFrom + " and " + dateTo + " with clienId " + clientId);
 		
 		try {
 			
@@ -370,24 +455,24 @@ public class MenuService {
 				orderResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
 				orderResponse.setCode(ResponseCode.NOT_FOUND.fieldNumber());
 				orderResponse.setStatus(HttpStatus.NOT_FOUND.value());
+				logger.warn("No orders found");
 				return HttpStatus.NOT_FOUND;
 			}
 			
 			orderResponse.setOrders(orderList.get());
-			
 			orderResponse.setMessage(ResponseCode.FOUND.fieldName() );
 			orderResponse.setCode(ResponseCode.FOUND.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
 			
 		} catch (FieldTypeException e) {
-			
+			logger.warn("FieldTypeException: " + e.getDescriptionString());
 			orderResponse.setCode(ResponseCode.NUMBER_TYPE_ERROR.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.NUMBER_TYPE_ERROR.fieldName());
 			return HttpStatus.BAD_REQUEST;
 			
 		} catch (ServiceException e) {
-			
+			logger.warn("ServiceException: " + e.getDescriptionString());
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
@@ -433,6 +518,46 @@ public class MenuService {
 			if(clientId != null) new Long(clientId);
 		}catch(Exception e) {
 			throw new FieldTypeException("Must be a numeric value");
+		}
+	}
+	
+	private Boolean validateOrderStatus(OrderRequest orderRequest, Order order) {
+		//Chequeo el status de la order
+		String nextStatus = getNextStatus(order.getStatus());
+		String previousStatus = getPreviousStatus(order.getStatus());
+		//Devuelvo true si el estado es correcto
+		return (nextStatus.equals(orderRequest.getStatus()) || previousStatus.equals(orderRequest.getStatus())); 
+	}
+	
+	private String getNextStatus(String status) {
+		switch(status) {
+		case OrderConstant.PENDING:
+			return OrderConstant.CONFIRM;
+		case OrderConstant.CONFIRM:
+			return OrderConstant.KITCHEN;
+		case OrderConstant.KITCHEN:
+			return OrderConstant.DELIVER;
+		case OrderConstant.DELIVER:
+			return OrderConstant.FINISHED;
+		default:
+			return "";
+			
+		}
+	}
+	
+	private String getPreviousStatus(String status) {
+		switch(status) {
+		case OrderConstant.CONFIRM:
+			return OrderConstant.PENDING;
+		case OrderConstant.KITCHEN:
+			return OrderConstant.CONFIRM;
+		case OrderConstant.DELIVER:
+			return OrderConstant.KITCHEN;
+		case OrderConstant.FINISHED:
+			return OrderConstant.DELIVER;
+		default:
+			return "";
+			
 		}
 	}
 

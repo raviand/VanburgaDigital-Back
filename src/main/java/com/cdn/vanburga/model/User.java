@@ -1,10 +1,14 @@
 package com.cdn.vanburga.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -30,5 +34,8 @@ public class User {
 	private String idToken;
 	private String password;
 	private String phone;
+	@OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH})
+    @JoinColumn(name = "roleId", referencedColumnName = "id")
+	private Role role;
 	
 }
