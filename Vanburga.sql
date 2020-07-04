@@ -5,27 +5,53 @@ USE Vanburga;
 ##Modifique las mayusculas por la estructura de codigo (cammelCase)
 
 ##CAMBIE EL NOMBRE DE COLUMNA CATEGORIA POR NOMBRE, ES MAS REPRESENTATIVO.
-CREATE TABLE IF NOT EXISTS Category(
+CREATE TABLE IF NOT EXISTS category(
 id INT AUTO_INCREMENT PRIMARY KEY,
 name VARCHAR(70) NOT NULL,
 description VARCHAR(2000) NULL
 );
 
-CREATE TABLE IF NOT EXISTS state(
-id INT AUTO_INCREMENT PRIMARY KEY,
-state VARCHAR(70) NOT NULL
+CREATE TABLE IF NOT EXISTS role(
+id INT PRIMARY KEY,
+role VARCHAR(30)
 );
 
-CREATE TABLE IF NOT EXISTS Client(
+CREATE TABLE IF NOT EXISTS user(
+id 			INT AUTO_INCREMENT PRIMARY KEY,
+loginId		varchar(100) NULL,
+name 		VARCHAR(70) NOT NULL,
+email  		VARCHAR(100) NULL,
+provider 	varchar(100)NULL,
+providerId 	varchar (100) NULL,
+imageUrl 	varchar(500) NULL,
+token 		varchar (500) NULL,
+idToken 	varchar(1500) NULL,
+password 	varchar(100) Null,
+phone		varchar(100) Null,
+roleId		INT NULL,
+FOREIGN KEY(roleId)
+		REFERENCES role(id)
+);
+
+CREATE TABLE IF NOT EXISTS state(
+id INT AUTO_INCREMENT PRIMARY KEY,
+state VARCHAR(70) NOT NULL,
+amount DECIMAL(13,2) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS client(
 id INT AUTO_INCREMENT PRIMARY KEY,
 name VARCHAR(100),
 lastName VARCHAR(100),
 cellphone VARCHAR(50),
-mail VARCHAR(100)
+mail VARCHAR(100),
+userId INT NULL,
+FOREIGN KEY (userId)
+		REFERENCES user(id)
 );
 
 ##AGREGUE IDDIRECCION. ADEMAS LOS VALORES CP, ALTURA Y PISO LOS HICE VARCHAR.
-CREATE TABLE IF NOT EXISTS Address(
+CREATE TABLE IF NOT EXISTS address(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idClient INT,
 idState INT,
@@ -37,7 +63,7 @@ door VARCHAR(10) NULL,
 FOREIGN KEY (idState)
         REFERENCES state (id),
 FOREIGN KEY(idClient)
-		REFERENCES Client(id)
+		REFERENCES client(id)
 );
 
 ##CAMBIE EL NOMBRE DE COLUMNA PRODUCTO POR NOMBRE, ES MAS REPRESENTATIVO.
@@ -55,11 +81,11 @@ description VARCHAR(2000) NULL,
 color varchar(10),
 available BOOLEAN DEFAULT TRUE,
 FOREIGN KEY(idCategory)
-		REFERENCES Category(id)
+		REFERENCES category(id)
 );
 
 ##CAMBIE EL NOMBRE DE COLUMNA EXTRA POR NOMBRE, ES MAS REPRESENTATIVO.
-CREATE TABLE IF NOT EXISTS Extra(
+CREATE TABLE IF NOT EXISTS extra(
 id INT PRIMARY KEY,
 code varchar(50) null unique,
 name VARCHAR(150) NOT NULL,
@@ -76,14 +102,14 @@ idExtra INT NOT NULL,
 idProduct INT NOT NULL,
 PRIMARY KEY(idExtra, idProduct),
 FOREIGN KEY(idExtra)
-		REFERENCES Extra(id),
+		REFERENCES extra(id),
 FOREIGN KEY(idProduct)
-		REFERENCES Product(id)
+		REFERENCES product(id)
 );
 
 ##CAMBIA EL FORMATO DE MONTO POR DECIMAL
 ##AGREGO DEFAULT PARA LA FECHA EN FORMATO TIMESTAMP (
-CREATE TABLE IF NOT EXISTS `Order`(
+CREATE TABLE IF NOT EXISTS `order`(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idClient INT NOT NULL,
 status varchar (50) null,
@@ -95,39 +121,25 @@ FOREIGN KEY(idClient)
 		REFERENCES Client(id)
 );
 
-CREATE TABLE IF NOT EXISTS OrderDetail(
+CREATE TABLE IF NOT EXISTS orderDetail(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idProduct INT NOT NULL,
 idOrder INT NOT NULL,
 FOREIGN KEY(idProduct)
-		REFERENCES Product(id),
+		REFERENCES product(id),
 FOREIGN KEY(idOrder)
-		REFERENCES `Order`(id)
+		REFERENCES `order`(id)
 );
 
-CREATE TABLE IF NOT EXISTS ExtraOrderDetail(
+CREATE TABLE IF NOT EXISTS extraOrderDetail(
 id INT AUTO_INCREMENT PRIMARY KEY,
 idOrderDetail INT NOT NULL,
 idExtra INT NOT NULL,
 quantity INT NOT NULL,
 FOREIGN KEY(idOrderDetail)
-		REFERENCES OrderDetail(id),
+		REFERENCES orderDetail(id),
 FOREIGN KEY(idExtra)
-		REFERENCES Extra(id)
-);
-
-CREATE TABLE IF NOT EXISTS User(
-id 			INT AUTO_INCREMENT PRIMARY KEY,
-loginId		varchar(100) NULL,
-name 		VARCHAR(70) NOT NULL,
-email  		VARCHAR(100) NULL,
-provider 	varchar(100)NULL,
-providerId 	varchar (100) NULL,
-imageUrl 	varchar(500) NULL,
-token 		varchar (500) NULL,
-idToken 	varchar(1500) NULL,
-password 	varchar(100) Null,
-phone		varchar(100) Null
+		REFERENCES extra(id)
 );
 
 
@@ -147,13 +159,13 @@ description  varchar(150) not null
 INSERT INTO category(name, description) values ('Burgers','Las mejores del condado');
 INSERT INTO category(name, description) values ('Bebidas','Tomate una fresca');
 INSERT INTO category(name, description) values ('Acompañamientos','No podes pedir la hamburguesa sin unas buenas papas');
-INSERT INTO state(state) values ('Don Torcuato');
-INSERT INTO state(state) values ('Ricardo Rojas');
-INSERT INTO state(state) values ('El Talar');
-INSERT INTO state(state) values ('General Pacheco');
-INSERT INTO state(state) values ('Benavídez');
-INSERT INTO state(state) values ('Los troncos del Talar');
-INSERT INTO state(state) values ('Nordelta');
+INSERT INTO state(state, amount) values ('Don Torcuato', 50);
+INSERT INTO state(state, amount) values ('Ricardo Rojas', 50);
+INSERT INTO state(state, amount) values ('El Talar', 50);
+INSERT INTO state(state, amount) values ('General Pacheco', 50);
+INSERT INTO state(state, amount) values ('Benavídez', 50);
+INSERT INTO state(state, amount) values ('Los troncos del Talar', 50);
+INSERT INTO state(state, amount) values ('Nordelta', 50);
 INSERT INTO client(name, lastName, cellphone, mail) values ('Franco','Hildt','1123977072', 'franhildt@gmail.com');
 INSERT INTO client(name, lastName, cellphone, mail) values ('Nico','Rohland','1133886456', 'nrohland@gmail.com');
 INSERT INTO address(idclient, idstate, street, doorNumber, zipcode) values ('1','1','Los Alamos','895', '1667');
@@ -204,11 +216,13 @@ INSERT INTO productByExtra(idProduct, idExtra) values (9, 1);
 INSERT INTO productByExtra(idProduct, idExtra) values (9, 2);
 INSERT INTO productByExtra(idProduct, idExtra) values (9, 3);
 INSERT INTO productByExtra(idProduct, idExtra) values (9, 4);
-INSERT INTO `Order`(idclient, comments, amount) values ('1','Haganme la hamburguesa con amor','420');
-INSERT INTO OrderDetail(idproduct,idorder) values ('1','1');
-INSERT INTO OrderDetail(idproduct,idorder) values ('2','1');
-INSERT INTO ExtraOrderDetail(idOrderDetail, idExtra, quantity) values ('1', '1', 1);
-
+INSERT INTO `order`(idclient, comments, amount) values ('1','Haganme la hamburguesa con amor','420');
+INSERT INTO orderDetail(idproduct,idorder) values ('1','1');
+INSERT INTO orderDetail(idproduct,idorder) values ('2','1');
+INSERT INTO extraOrderDetail(idOrderDetail, idExtra, quantity) values ('1', '1', 1);
+INSERT INTO role(id, role) values (1, "Admin");
+INSERT INTO role(id, role) values (2, "Manager");
+INSERT INTO role(id, role) values (3, "Seller");
 
 
 
