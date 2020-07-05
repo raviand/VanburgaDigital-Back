@@ -20,31 +20,11 @@ public class OrderResponse extends BaseResponse{
 	
 	@JsonIgnore
 	private Address address;
-	@JsonIgnore
+
 	private Order order;
 	@JsonIgnore
-	private List<Product> prodcts;
+	private List<Product> products;
 	
 	private List<Order> orders;
 	
-	
-	
-	@Data
-	public class OrderDetail{
-		
-		private Order order;
-		
-		private List<Product> prodcts;
-		
-	}
-	
-	public OrderDetail getOrderDetail() {
-		if(this.order == null) return null;
-		OrderDetail orderDetail = new OrderDetail();
-		orderDetail.setOrder(this.order);
-		orderDetail.getOrder().getClient().setAddress(this.address);
-		orderDetail.setProdcts(this.prodcts);
-		return orderDetail;
-		
-	}
 }

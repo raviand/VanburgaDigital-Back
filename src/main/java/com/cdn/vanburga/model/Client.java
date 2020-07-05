@@ -12,11 +12,15 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 @Entity
+@JsonInclude(Include.NON_NULL)
 public class Client {
 	
 	@Schema(description = "Unique identifier of the Contact.", 
@@ -32,8 +36,6 @@ public class Client {
 	private Long id;
 	
 	private String name;
-	
-	private String lastName;
 	
 	private String cellphone;
 	

@@ -144,6 +144,9 @@ public class MenuController implements MenuControllerInterface{
     		String dateFrom,
     		String dateTo,
     		String clientId,
+    		String name,
+    		String orderId,
+    		String state,
     		HttpServletRequest request){
 		
 		OrderResponse orderResponse = new OrderResponse();
@@ -152,7 +155,10 @@ public class MenuController implements MenuControllerInterface{
 				status,
 	    		dateFrom,
 	    		dateTo,
-	    		clientId, orderResponse);
+	    		clientId,
+	    		name,
+	    		orderId,
+	    		state, orderResponse);
 		
 		return ResponseEntity.status(httpStatus).body(orderResponse);
 	

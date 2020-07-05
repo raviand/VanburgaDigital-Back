@@ -167,15 +167,14 @@ public class MenuService {
 		
 			//REGISTRA CLIENTE
 			Client client = new Client();
-			client.setName(orderRequest.getClient().getName());
-			client.setLastName(orderRequest.getClient().getLastName());
+			client.setName(orderRequest.getClient().getName() + " " + orderRequest.getClient().getLastName());
 			client.setMail(orderRequest.getClient().getMail());
 			client.setCellphone(orderRequest.getClient().getCellphone());
 			client = clientRepository.save(client);
 			
 			//Registra la direccion
 			Address address = new Address();
-			if(orderRequest.getDelivery().booleanValue()) {				
+			if(orderRequest.getDelivery().booleanValue()) {
 				address.setClient(client);
 				address.setDoor(orderRequest.getClient().getAddress().getDoor());
 				address.setDoorNumber(orderRequest.getClient().getAddress().getDoorNumber());
@@ -192,6 +191,7 @@ public class MenuService {
 			//Crea la orden de pedido
 			Order order = new Order();
 			order.setClient(client);
+			order.setDelivery(orderRequest.getDelivery());
 			order.setComments(orderRequest.getComment());
 			order.setCreateDate(LocalDateTime.now());
 			order.setAmount(new BigDecimal(0));
@@ -230,7 +230,7 @@ public class MenuService {
 			//Formo la respuesta del servicio
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
-			orderResponse.setProdcts(orderRequest.getProducts());
+			orderResponse.setProducts(orderRequest.getProducts());
 			orderResponse.setMessage(ResponseCode.OK.fieldName());
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
@@ -415,9 +415,9 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 					extras = new ArrayList<Extra>();
 				}
 			}
+			order.get().setProducts(productDataList);
+			if(address.isPresent()) order.get().getClient().setAddress(address.get());
 			orderResponse.setOrder(order.get());
-			if(address.isPresent()) orderResponse.setAddress(address.get());
-			orderResponse.setProdcts(productDataList);
 			
 		}else {
 			orderResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
@@ -436,19 +436,26 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	public HttpStatus findOrders(String status,  
 			String dateFrom,
 			String dateTo,  
-			String clientId,OrderResponse orderResponse) {
+			String clientId,
+			String name,
+			String orderId,
+			String state,
+    		OrderResponse orderResponse) {
 		logger.info("Finding orders for status " + status + " between " + dateFrom + " and " + dateTo + " with clienId " + clientId);
 		
 		try {
 			
-			validateOrderSearch(status, dateFrom, dateTo, clientId);
+			validateOrderSearch(status, dateFrom, dateTo, clientId, name, orderId, state);
 			
 			LocalDateTime from = LocalDateTimeAttributeConverter.deserialize(dateFrom);
 			//Por defecto si no se envia el campo "dateTo" se setea el campo con la fecha del sistema
 			LocalDateTime to = dateTo != null ? LocalDateTimeAttributeConverter.deserialize(dateTo) : LocalDateTime.now();
 			Long client = clientId != null ? new Long(clientId) : null;
+			Long idOrder = orderId != null ? new Long(orderId) : null;
 						
-			Optional<List<Order>> orderList = orderRepository.findByParameters(from, to, status, client);
+			Optional<List<Order>> orderList = orderRepository.findByParameters(from, to, status, client, name, idOrder, state);
+			
+			//Completo las orders con productos
 			
 			if(!orderList.isPresent()) {
 				orderResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
@@ -458,7 +465,35 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 				return HttpStatus.NOT_FOUND;
 			}
 			
-			orderResponse.setOrders(orderList.get());
+			List<Order> resultOrderList = new ArrayList<Order>();
+			
+			for(Order order : orderList.get()) {
+				Optional<Address> address = addressRepository.findByClient(order.getClient()); 
+				Optional<List<OrderDetail>> orderDetailList = orderDetailRepository.findByOrder(order);
+				Optional<List<ExtraOrderDetail>> extraOrderDetailList = extraOrderDetailRepository.findByOrder(order);
+				List<Extra> extras = new ArrayList<Extra>();
+				List<Product> productDataList = new ArrayList<Product>();
+				if(orderDetailList.isPresent()) {
+					for (OrderDetail od : orderDetailList.get()) {
+						if(extraOrderDetailList.isPresent()) {		
+							for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
+								if(ex.getOrderDetail().getId() == od.getId()) {
+									extras.add(ex.getExtra());
+								}
+							}
+						}
+						od.getProduct().setExtras(extras);
+						productDataList.add(od.getProduct());
+						extras = new ArrayList<Extra>();
+					}
+				}
+				
+				if(address.isPresent()) order.getClient().setAddress(address.get());
+				order.setProducts(productDataList);
+				resultOrderList.add(order);
+			}
+			
+			orderResponse.setOrders(resultOrderList);
 			orderResponse.setMessage(ResponseCode.FOUND.fieldName() );
 			orderResponse.setCode(ResponseCode.FOUND.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
@@ -512,11 +547,20 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 		if(orderRequest.getOrderId() == null) throw new MissingFieldException("OrderId missing").setDescriptionString("OrderId Object");
 	}
 	
-	private void validateOrderSearch(String status, String dateFrom,String  dateTo, String clientId)throws ServiceException{
+	private void validateOrderSearch(String status, String dateFrom, String dateTo, String clientId, String name, String orderId, String state)throws ServiceException{
 		try {
 			if(clientId != null) new Long(clientId);
+			if(orderId != null) new Long(orderId);
+			
+			if(status != null && dateFrom != null && dateTo != null && clientId != null && name != null && orderId != null && state != null) {
+				throw new ServiceException("Filters must have a value to filter"); 
+			}
+		}catch(ServiceException e) {
+			logger.error("Filters must have a value to filter");
+			throw new ServiceException("Filters must have a value to filter");
 		}catch(Exception e) {
-			throw new FieldTypeException("Must be a numeric value");
+			logger.error("orderID must be a numeric value");
+			throw new FieldTypeException("orderID must be a numeric value");
 		}
 	}
 	
