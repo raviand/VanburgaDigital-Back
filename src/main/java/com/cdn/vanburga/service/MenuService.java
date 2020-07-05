@@ -47,8 +47,6 @@ import com.cdn.vanburga.repository.StateRepository;
 import com.cdn.vanburga.util.LocalDateTimeAttributeConverter;
 import com.mysql.cj.Constants;
 
-import jdk.internal.jline.internal.Log;
-
 @Service
 public class MenuService {
 
@@ -223,6 +221,7 @@ public class MenuService {
 				}
 			}
 			//Registro el monto total del pedido
+			if(address != null) totalAmount.add(address.getState().getAmount());
 			order.setAmount(totalAmount);
 			order.setStatus(OrderConstant.PENDING);
 			order = orderRepository.save(order);
