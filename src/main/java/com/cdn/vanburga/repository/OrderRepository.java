@@ -15,7 +15,19 @@ public interface OrderRepository extends JpaRepository<Order, Long>{
 	
 	@Query(" select o from Order o where o.createDate between ?1 and ?2 "
 			+ " and (?3 = NULL or o.status = ?3 )"
-			+ " and (?4 = NULL or o.client.id = ?4 )")
-	Optional<List<Order>> findByParameters(LocalDateTime dateFrom,LocalDateTime dateTo,String status,Long clientId);
+			+ " and (?4 = NULL or o.client.id = ?4 )"
+			+ " and (?5 = NULL or o.client.name like %?5% )"
+			+ " and (?6 = NULL or o.id = ?6 )"
+			//+ " and (?7 = NULL or o.client.address.state.state = ?7 )"
+			)
+	Optional<List<Order>> findByParameters( LocalDateTime dateFrom, //1
+											LocalDateTime dateTo, //2
+											String status, //3
+											Long clientId, //4
+											String name, //5
+											Long order, //6
+											String state); //7
+	
+	
 	
 }

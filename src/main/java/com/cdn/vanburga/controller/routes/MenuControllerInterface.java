@@ -63,6 +63,9 @@ public interface MenuControllerInterface {
     		@RequestParam (required = false) String dateFrom,
     		@RequestParam (required = false) String dateTo,
     		@RequestParam (required = false) String clientId,
+    		@RequestParam (required = false) String name,
+    		@RequestParam (required = false) String orderId,
+    		@RequestParam (required = false) String state,
     		HttpServletRequest request);
 	
 	@PutMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
