@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import lombok.Data;
 
@@ -23,6 +24,9 @@ public class Extra {
 	private Integer rawMaterial;
 	
 	private Integer quantityLimit;
+	
+	@Transient
+	private Integer quantity;
 	
 	private Boolean available;
 	

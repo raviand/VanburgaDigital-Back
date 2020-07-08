@@ -214,7 +214,7 @@ public class MenuService {
 						ExtraOrderDetail extraOrder = new ExtraOrderDetail();
 						extraOrder.setExtra(e);
 						extraOrder.setOrderDetail(orderDetail);
-						extraOrder.setQuantity(1);
+						extraOrder.setQuantity(e.getQuantity());
 						totalAmount = totalAmount.add(e.getPrice());
 						extraOrder = extraOrderDetailRepository.save(extraOrder);
 					}
@@ -406,6 +406,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 					if(extraOrderDetailList.isPresent()) {		
 						for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
 							if(ex.getOrderDetail().getId() == od.getId()) {
+								ex.getExtra().setQuantity(ex.getQuantity());
 								extras.add(ex.getExtra());
 							}
 						}
@@ -478,6 +479,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 						if(extraOrderDetailList.isPresent()) {		
 							for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
 								if(ex.getOrderDetail().getId() == od.getId()) {
+									ex.getExtra().setQuantity(ex.getQuantity());
 									extras.add(ex.getExtra());
 								}
 							}
