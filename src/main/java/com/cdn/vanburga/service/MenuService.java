@@ -160,6 +160,7 @@ public class MenuService {
 	public HttpStatus createOrder(OrderRequest orderRequest, OrderResponse orderResponse) {
 		
 		logger.info("Creating order");
+		BigDecimal totalAmount = new BigDecimal(0);
 		
 		try {
 			validateOrderRequestCreate(orderRequest);
@@ -186,6 +187,7 @@ public class MenuService {
 				address.setStreet(orderRequest.getClient().getAddress().getStreet());
 				address.setZipCode(orderRequest.getClient().getAddress().getZipCode());
 				address = addressRepository.save(address);
+				totalAmount.add(address.getState().getAmount());
 			}
 			
 			//Crea la orden de pedido
@@ -198,7 +200,6 @@ public class MenuService {
 			//Calcular monto total de la orden
 			order = orderRepository.save(order);
 	
-			BigDecimal totalAmount = new BigDecimal(0);
 			//Registra los productos y por cada producto, sus extras
 			
 			//List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
@@ -221,7 +222,6 @@ public class MenuService {
 				}
 			}
 			//Registro el monto total del pedido
-			if(address != null) totalAmount.add(address.getState().getAmount());
 			order.setAmount(totalAmount);
 			order.setStatus(OrderConstant.PENDING);
 			order = orderRepository.save(order);
