@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cdn.vanburga.controller.routes.MenuControllerInterface;
+import com.cdn.vanburga.model.Extra;
 import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.User;
 import com.cdn.vanburga.model.request.OrderRequest;
@@ -147,6 +148,7 @@ public class MenuController implements MenuControllerInterface{
     		String name,
     		String orderId,
     		String state,
+    		String categoryId,
     		HttpServletRequest request){
 		
 		OrderResponse orderResponse = new OrderResponse();
@@ -158,7 +160,8 @@ public class MenuController implements MenuControllerInterface{
 	    		clientId,
 	    		name,
 	    		orderId,
-	    		state, orderResponse);
+	    		state,
+	    		categoryId, orderResponse);
 		
 		return ResponseEntity.status(httpStatus).body(orderResponse);
 	
@@ -175,6 +178,13 @@ public class MenuController implements MenuControllerInterface{
 		return ResponseEntity.status(status).body(userResponse);
 		
 		
+	}
+	
+	/**
+	 * Busca todos los extras creados
+	 */
+	public ResponseEntity<List<Extra>> getExtras(HttpServletRequest request){
+		return ResponseEntity.status(HttpStatus.OK).body(menuService.getExtras());
 	}
 
 }

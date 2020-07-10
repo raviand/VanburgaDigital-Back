@@ -41,7 +41,7 @@ public class Address {
 	
 	private String doorNumber;
 	
-	private String zipCode;
+	private String reference;
 	
 	private String floor;
 	

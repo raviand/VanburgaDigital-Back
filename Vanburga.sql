@@ -57,7 +57,7 @@ idClient INT,
 idState INT,
 street VARCHAR(100) NOT NULL,
 doorNumber VARCHAR(50) NULL,
-zipCode VARCHAR(4) NULL,
+reference VARCHAR(50) NULL,
 floor VARCHAR(50) NULL,
 door VARCHAR(10) NULL,
 FOREIGN KEY (idState)
@@ -117,6 +117,8 @@ comments VARCHAR(2000) NULL,
 createDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 amount DECIMAL(13,2) NOT NULL,
 delivery BOOL default false,
+deliverTime VARCHAR (10) null,
+paymentType VARCHAR (50) null,
 FOREIGN KEY(idClient)
 		REFERENCES Client(id)
 );

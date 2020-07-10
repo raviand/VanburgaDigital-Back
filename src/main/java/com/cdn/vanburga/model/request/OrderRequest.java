@@ -3,6 +3,7 @@ package com.cdn.vanburga.model.request;
 import java.util.List;
 
 import com.cdn.vanburga.model.Product;
+import com.cdn.vanburga.model.State;
 
 import lombok.Data;
 
@@ -21,6 +22,10 @@ public class OrderRequest {
 	
 	private Boolean delivery;
 	
+	private String deliverTime;
+	
+	private String paymentType;
+	
 	@Data
 	public class ClientReq{
 		private String name;
@@ -34,10 +39,10 @@ public class OrderRequest {
 	    public class AddressReq{
 	    	private String street;
 	    	private String doorNumber;
-	    	private String zipCode;
+	    	private String reference;
 	    	private String floor;
 	    	private String door;
-	    	private Long state;
+	    	private State state;
 	    }
 	}
 

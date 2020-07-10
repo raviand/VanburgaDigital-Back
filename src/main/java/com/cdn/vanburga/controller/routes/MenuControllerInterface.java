@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.cdn.vanburga.model.Extra;
 import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.User;
 import com.cdn.vanburga.model.request.OrderRequest;
@@ -38,6 +39,9 @@ public interface MenuControllerInterface {
 	
 	@GetMapping(path = "/category", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<CategoryResponse> getCategory(HttpServletRequest request);
+	
+	@GetMapping(path = "/extra", produces = (MediaType.APPLICATION_JSON_VALUE))
+	public ResponseEntity<List<Extra>> getExtras(HttpServletRequest request);
 	
 	/**********************************************************************
 	 * endpoints de Producto
@@ -66,6 +70,7 @@ public interface MenuControllerInterface {
     		@RequestParam (required = false) String name,
     		@RequestParam (required = false) String orderId,
     		@RequestParam (required = false) String state,
+    		@RequestParam (required = false) String categoryId,
     		HttpServletRequest request);
 	
 	@PutMapping(path = "/order", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))

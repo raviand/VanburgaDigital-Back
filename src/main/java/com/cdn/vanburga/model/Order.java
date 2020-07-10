@@ -49,6 +49,10 @@ public class Order {
 	
 	private Boolean delivery;
 	
+	private String deliverTime;
+	
+	private String paymentType;
+	
 	@Transient
 	private List<Product> products;
 	

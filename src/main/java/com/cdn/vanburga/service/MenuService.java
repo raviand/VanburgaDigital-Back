@@ -39,6 +39,7 @@ import com.cdn.vanburga.repository.AddressRepository;
 import com.cdn.vanburga.repository.CategoryRepository;
 import com.cdn.vanburga.repository.ClientRepository;
 import com.cdn.vanburga.repository.ExtraOrderDetailRepository;
+import com.cdn.vanburga.repository.ExtraRepository;
 import com.cdn.vanburga.repository.OrderDetailRepository;
 import com.cdn.vanburga.repository.OrderRepository;
 import com.cdn.vanburga.repository.ProductExtraRepository;
@@ -78,7 +79,14 @@ public class MenuService {
 	@Autowired @Lazy
 	private StateRepository stateRepository;
 	
+	@Autowired @Lazy
+	private ExtraRepository extraRepository;
+	
 	private List<State> stateList;
+	
+	public List<Extra>getExtras(){
+		return extraRepository.findAllByOrderByCode();
+	}
 		
 	public HttpStatus getAllCategories(CategoryResponse response) {
 		logger.info("Searching all categories");
@@ -183,9 +191,9 @@ public class MenuService {
 				if(stateList == null || stateList.isEmpty()) {
 					this.stateList = stateRepository.findAll();
 				}
-				address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().longValue()).findAny().get());
+				address.setState(stateList.stream().filter(s -> s.getId().longValue() == orderRequest.getClient().getAddress().getState().getId().longValue()).findAny().get());
 				address.setStreet(orderRequest.getClient().getAddress().getStreet());
-				address.setZipCode(orderRequest.getClient().getAddress().getZipCode());
+				address.setReference(orderRequest.getClient().getAddress().getReference());
 				address = addressRepository.save(address);
 				totalAmount.add(address.getState().getAmount());
 			}
@@ -195,6 +203,7 @@ public class MenuService {
 			order.setClient(client);
 			order.setDelivery(orderRequest.getDelivery());
 			order.setComments(orderRequest.getComment());
+			order.setPaymentType(orderRequest.getPaymentType());
 			order.setCreateDate(LocalDateTime.now());
 			order.setAmount(new BigDecimal(0));
 			//Calcular monto total de la orden
@@ -292,6 +301,7 @@ public class MenuService {
 			return HttpStatus.BAD_REQUEST;
 		}
 		order.get().setStatus(orderRequest.getStatus());
+		if(orderRequest.getDeliverTime() != null) order.get().setDeliverTime(orderRequest.getDeliverTime());
 		orderRepository.save(order.get());
 		orderResponse.setOrder(order.get());
 		orderResponse.setMessage("Order updated");
@@ -441,6 +451,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 			String name,
 			String orderId,
 			String state,
+			String categoryId,
     		OrderResponse orderResponse) {
 		logger.info("Finding orders for status " + status + " between " + dateFrom + " and " + dateTo + " with clienId " + clientId);
 		
@@ -537,7 +548,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 			if(orderRequest.getClient().getAddress() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
 			if(orderRequest.getClient().getAddress().getStreet() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
 			if(orderRequest.getClient().getAddress().getDoorNumber() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
-			if(orderRequest.getClient().getAddress().getZipCode() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
+			//if(orderRequest.getClient().getAddress().getZipCode() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
 			if(orderRequest.getClient().getAddress().getState() == null) throw new MissingFieldException("Client.Address missing").setDescriptionString("Client.Address Object");
 		}
 		
