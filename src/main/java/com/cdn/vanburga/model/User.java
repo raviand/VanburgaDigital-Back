@@ -17,6 +17,7 @@ import lombok.Data;
 
 @Entity
 @Data
+@JsonInclude(Include.NON_NULL)
 public class User {
 
 	@Id

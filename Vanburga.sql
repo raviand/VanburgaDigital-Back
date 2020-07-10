@@ -159,7 +159,7 @@ description  varchar(150) not null
 
 ##TABLE'S POPULATION
 INSERT INTO Category(name, description) values ('Burgers','Las mejores del condado');
-INSERT INTO Category(name, description) values ('Bebidas','Tomate una fresca');
+INSERT INTO Category(name, description) values ('Bebidas y otros','Tomate una fresca');
 INSERT INTO State(state, amount) values ('Gral. Pacheco',40);
 INSERT INTO State(state, amount) values ('Talar',50);
 INSERT INTO State(state, amount) values ('Los Troncos',50);
@@ -183,7 +183,7 @@ INSERT INTO Product(id, name, idCategory, price, description, code) values (14, 
 INSERT INTO Product(id, name, idCategory, price, description, code) values (15, 'Tacuara Porter','2',170,'Lata de 473 ml - Porter (Cervecería Tacuara)','B-POR');
 INSERT INTO Product(id, name, idCategory, price, description, code) values (16, 'Tacuara APA Sorachi','2',180,'Lata de 473 ml - American pale ale (Cervecería Tacuara)','B-APA');
 INSERT INTO Product(id, name, idCategory, price, description, code) values (17, 'Porción de papas','1',130,'Porción de papas','A-PPC');
-INSERT INTO Product(id, name, idCategory, price, description, code) values (18, 'Franui','1',270,'Frambuesas bañadas en chocolate','P-FRA');
+INSERT INTO Product(id, name, idCategory, price, description, code) values (18, 'Franui','2',270,'Frambuesas bañadas en chocolate','P-FRA');
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (1,'Extra cheddar',15,'E-CH',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (2,'Extra bacon',50,'E-BA',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (3,'Extra pickles de pepino',30,'E-PP',1);

@@ -118,17 +118,24 @@ public class MenuService {
 			response.setMessage(ResponseCode.NOT_FOUND.fieldName());
 			return HttpStatus.NOT_FOUND;
 		}
-		List<ProductData> productDataList = new ArrayList<ProductData>();
+		List<Product> productResponseList = new ArrayList<Product>();
 		for(Product p : productList.get()) {
-			Optional<List<ProductExtra>> productExtraList = productExtraRepository.findByProductExtraProduct(p.getId());
-			if(productExtraList.isPresent()) {	
-				logger.debug("Extras found - size: " + productList.get().size());
+			if(p.getAvailable()) {
+				Optional<List<ProductExtra>> productExtraList = productExtraRepository.findByProductExtraProduct(p.getId());
 				List<Extra> extras = new ArrayList<Extra>();
-				productExtraList.get().stream().forEach(e -> extras.add(e.getProductExtra().getExtra()));
+				if(productExtraList.isPresent()) {
+					logger.debug("Extras found - size: " + productList.get().size());
+					for (ProductExtra e : productExtraList.get()) {
+						if(e.getProductExtra().getExtra().getAvailable()) {
+							extras.add(e.getProductExtra().getExtra());
+						}	
+					}
+				}
 				p.setExtras(extras);
+				productResponseList.add(p);
 			}
 		}
-		response.setProducts(productList.get());
+		response.setProducts(productResponseList);
 		response.setCode(ResponseCode.FOUND.fieldNumber());
 		response.setStatus(HttpStatus.OK.value());
 		response.setMessage(ResponseCode.FOUND.fieldName());
@@ -142,19 +149,26 @@ public class MenuService {
 		Optional<Product> product = productRepository.findById(id);
 		
 		if (product.isPresent()) {
-			logger.debug("Product found - name: [" + product.get().getName() +"] Searching Extras of this product " );
-			Optional<List<ProductExtra>> productList = productExtraRepository.findByProductExtraProduct(product.get().getId());
-			if(productList.isPresent()) {	
-				logger.debug("Extras found - size: " + productList.get().size());
-				List<Extra> extras = new ArrayList<Extra>();
-				productList.get().stream().forEach(e -> extras.add(e.getProductExtra().getExtra()));
-				product.get().setExtras(extras);
-			}
-			response.setProduct(product.get());
-			response.setCode(ResponseCode.FOUND.fieldNumber());
-			response.setStatus(HttpStatus.OK.value());
-			response.setMessage(ResponseCode.FOUND.fieldName());
-			return HttpStatus.OK;
+				if(product.get().getAvailable()) {
+					logger.debug("Product found - name: [" + product.get().getName() +"] Searching Extras of this product " );
+					Optional<List<ProductExtra>> productList = productExtraRepository.findByProductExtraProduct(product.get().getId());
+					if(productList.isPresent()) {
+						logger.debug("Extras found - size: " + productList.get().size());
+						List<Extra> extras = new ArrayList<Extra>();
+						for (ProductExtra e : productList.get()) {
+							if(e.getProductExtra().getExtra().getAvailable()) {
+								extras.add(e.getProductExtra().getExtra());
+							}	
+						}
+						product.get().setExtras(extras);
+						
+					}
+					response.setProduct(product.get());
+					response.setCode(ResponseCode.FOUND.fieldNumber());
+					response.setStatus(HttpStatus.OK.value());
+					response.setMessage(ResponseCode.FOUND.fieldName());
+					return HttpStatus.OK;
+				}
 		}
 		logger.warn("product with id "+ id.toString() +" not found");
 		response.setStatus(HttpStatus.NOT_FOUND.value());
