@@ -87,6 +87,10 @@ public class MenuService {
 	public List<Extra>getExtras(){
 		return extraRepository.findAllByOrderByCode();
 	}
+	
+	public HttpStatus getKitchen(KitchenResponse response) {
+		
+	}
 		
 	public HttpStatus getAllCategories(CategoryResponse response) {
 		logger.info("Searching all categories");
