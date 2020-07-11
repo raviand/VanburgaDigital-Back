@@ -20,6 +20,7 @@ import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.User;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
+import com.cdn.vanburga.model.response.KitchenResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
 import com.cdn.vanburga.model.response.UserResponse;
@@ -42,6 +43,13 @@ public interface MenuControllerInterface {
 	
 	@GetMapping(path = "/extra", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<List<Extra>> getExtras(HttpServletRequest request);
+	
+	/**********************************************************************
+	 * endpoints de Kitchen (OH YEAH BABY!)
+	 * ********************************************************************/
+	
+	@GetMapping(path = "/kitchen", consumes = (MediaType.APPLICATION_JSON_VALUE), produces = (MediaType.APPLICATION_JSON_VALUE))
+    public ResponseEntity<KitchenResponse> getKitchenStatus(HttpServletRequest request);
 	
 	/**********************************************************************
 	 * endpoints de Producto

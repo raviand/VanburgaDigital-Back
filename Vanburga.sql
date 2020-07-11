@@ -144,6 +144,20 @@ FOREIGN KEY(idExtra)
 		REFERENCES Extra(id)
 );
 
+CREATE TABLE IF NOT EXISTS Recipe(
+id INT PRIMARY KEY,
+description VARCHAR(40)
+);
+
+CREATE TABLE IF NOT EXISTS MenuRecipe(
+id INT AUTO_INCREMENT PRIMARY KEY,
+code varchar(50),
+idRecipe INT,
+quantity INT,
+FOREIGN KEY(idRecipe)
+		REFERENCES Recipe(id)
+);
+
 
 ##TABLAS Y DATOS PARA EL ENVÍO DE MAILS
 CREATE TABLE IF NOT EXISTS SystemProperty(
@@ -184,7 +198,7 @@ INSERT INTO Product(id, name, idCategory, price, description, code) values (15, 
 INSERT INTO Product(id, name, idCategory, price, description, code) values (16, 'Tacuara APA Sorachi','2',180,'Lata de 473 ml - American pale ale (Cervecería Tacuara)','B-APA');
 INSERT INTO Product(id, name, idCategory, price, description, code) values (17, 'Porción de papas','1',130,'Porción de papas','A-PPC');
 INSERT INTO Product(id, name, idCategory, price, description, code) values (18, 'Franui','2',270,'Frambuesas bañadas en chocolate','P-FRA');
-INSERT INTO Extra(id, name, price, code, quantityLimit) values (1,'Extra cheddar',15,'E-CH',1);
+INSERT INTO Extra(id, name, price, code, quantityLimit) values (1,'Extra cheddar por medallón',15,'E-CH',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (2,'Extra bacon',50,'E-BA',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (3,'Extra pickles de pepino',30,'E-PP',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (4,'Extra cebolla cruda',30,'E-CC',1);
@@ -203,7 +217,7 @@ INSERT INTO Extra(id, name, price, code, quantityLimit) values (16,'Sin ketchup'
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (17,'Sin mostaza',0,'Q-MO',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (18,'Sin tomate',0,'Q-TO',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (19,'Sin lechuga',0,'Q-LE',1);
-INSERT INTO Extra(id, name, price, code, quantityLimit) values (20,'Extra queso Emmenthal',15,'E-EM',1);
+INSERT INTO Extra(id, name, price, code, quantityLimit) values (20,'Extra queso Emmenthal por medallón',15,'E-EM',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (21,'Extra morrones con tabasco',30,'E-MT',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (22,'Cambio por queso cheddar',0,'E-CQC',1);
 INSERT INTO Extra(id, name, price, code, quantityLimit) values (23,'Sin cebolla cruda',0,'Q-CC',1);
@@ -282,7 +296,38 @@ INSERT INTO ProductByExtra(idProduct, idExtra) values (17,9);
 INSERT INTO Role(id, role) values (1, "Admin");
 INSERT INTO Role(id, role) values (2, "Manager");
 INSERT INTO Role(id, role) values (3, "Seller");
-
+INSERT INTO Recipe (ID, DESCRIPTION) VALUES (1,'Cheddar');
+INSERT INTO Recipe (ID, DESCRIPTION) VALUES (2,'Emmenthal');
+INSERT INTO Recipe (ID, DESCRIPTION) VALUES (3,'Medallon');
+INSERT INTO Recipe (ID, DESCRIPTION) VALUES (4,'Papas');
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CH',1,2);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CH',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CH',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-SW',1,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-SW',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-SW',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CR',1,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CR',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CR',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CV',1,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CV',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CV',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CL',1,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CL',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-CL',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-SM',2,2);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-SM',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('H-SM',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('A-PPC',4,250);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-CH',1,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-ME',3,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-CQE',1,0);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('Q-CH',1,-1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-EM',2,1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-CQC',1,0);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('Q-EM',2,-1);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-CQE',2,0);
+INSERT INTO MenuRecipe (CODE, IDRECIPE, QUANTITY) VALUES ('E-CQC',2,0);
 
 
 insert into SystemProperty (propertyKey,name,oldValue,newValue,description) values ('MailManager.hostNameString','MailManager Servidor SMTP','','localhost','Dirección IP o nombre del servidor SMTP para envío de mails.');

@@ -19,6 +19,7 @@ import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.User;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
+import com.cdn.vanburga.model.response.KitchenResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductResponse;
 import com.cdn.vanburga.model.response.UserResponse;
@@ -76,6 +77,16 @@ public class MenuController implements MenuControllerInterface{
 		HttpStatus status = menuService.getProductsByCategory(productResponse, categoryId);
 		
 		return ResponseEntity.status(status).body(productResponse);
+	}
+	
+	@Override
+	public ResponseEntity<KitchenResponse> getKitchenStatus(HttpServletRequest request){
+		
+		KitchenResponse kitchenResponse = new KitchenResponse();
+		
+		HttpStatus status = menuService.getKitchen(kitchenResponse);
+		
+		return ResponseEntity.status(status).body(kitchenResponse);
 	}
 	
 	@Override

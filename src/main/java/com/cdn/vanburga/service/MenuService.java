@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -25,6 +26,7 @@ import com.cdn.vanburga.model.Category;
 import com.cdn.vanburga.model.Client;
 import com.cdn.vanburga.model.Extra;
 import com.cdn.vanburga.model.ExtraOrderDetail;
+import com.cdn.vanburga.model.MenuRecipe;
 import com.cdn.vanburga.model.Order;
 import com.cdn.vanburga.model.OrderDetail;
 import com.cdn.vanburga.model.Product;
@@ -32,6 +34,7 @@ import com.cdn.vanburga.model.ProductExtra;
 import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
+import com.cdn.vanburga.model.response.KitchenResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductData;
 import com.cdn.vanburga.model.response.ProductResponse;
@@ -40,6 +43,7 @@ import com.cdn.vanburga.repository.CategoryRepository;
 import com.cdn.vanburga.repository.ClientRepository;
 import com.cdn.vanburga.repository.ExtraOrderDetailRepository;
 import com.cdn.vanburga.repository.ExtraRepository;
+import com.cdn.vanburga.repository.MenuRecipeRepository;
 import com.cdn.vanburga.repository.OrderDetailRepository;
 import com.cdn.vanburga.repository.OrderRepository;
 import com.cdn.vanburga.repository.ProductExtraRepository;
@@ -82,14 +86,208 @@ public class MenuService {
 	@Autowired @Lazy
 	private ExtraRepository extraRepository;
 	
+	@Autowired @Lazy
+	private MenuRecipeRepository menuRecipeRepository;
+	
 	private List<State> stateList;
 	
 	public List<Extra>getExtras(){
 		return extraRepository.findAllByOrderByCode();
 	}
 	
-	public HttpStatus getKitchen(KitchenResponse response) {
+	public HttpStatus getKitchen(KitchenResponse kitchenResponse) {
 		
+		
+		LocalDateTime from = LocalDateTime.now().minusDays(1);
+		LocalDateTime to = LocalDateTime.now();
+		Optional<List<Order>> orderList = orderRepository.findByParameters(from, to, OrderConstant.KITCHEN, null, null, null, null);
+		
+		if(!orderList.isPresent()) {
+			kitchenResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
+			kitchenResponse.setCode(ResponseCode.NOT_FOUND.fieldNumber());
+			kitchenResponse.setStatus(HttpStatus.NOT_FOUND.value());
+			logger.warn("No orders found");
+			return HttpStatus.NOT_FOUND;
+		}
+		
+		List<Order> resultOrderList = new ArrayList<Order>();
+		for(Order order : orderList.get()) {
+			Optional<Address> address = addressRepository.findByClient(order.getClient()); 
+			Optional<List<OrderDetail>> orderDetailList = orderDetailRepository.findByOrder(order);
+			Optional<List<ExtraOrderDetail>> extraOrderDetailList = extraOrderDetailRepository.findByOrder(order);
+			List<Extra> extras = new ArrayList<Extra>();
+			List<Product> productDataList = new ArrayList<Product>();
+			if(orderDetailList.isPresent()) {
+				for (OrderDetail od : orderDetailList.get()) {
+					if(extraOrderDetailList.isPresent()) {
+						for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
+							if(ex.getOrderDetail().getId() == od.getId()) {
+								ex.getExtra().setQuantity(ex.getQuantity());
+								extras.add(ex.getExtra());
+							}
+							//Por cada extra...
+						}
+					}
+					//Por cada producto...
+					od.getProduct().setExtras(extras);
+					productDataList.add(od.getProduct());
+					extras = new ArrayList<Extra>();
+				}
+				
+			}
+			//Por cada orden...
+			if(address.isPresent()) order.getClient().setAddress(address.get());
+			order.setProducts(productDataList);
+			resultOrderList.add(order);
+		}
+		/*********************************************/
+		Integer chips                         = 0; 
+		Integer grilledHamburger             = 0; 
+		Integer simpleCheddar                 = 0; 
+		Integer doubleCheddar                 = 0; 
+		Integer tripleCheddar                 = 0;
+		Integer simpleEmmenthal         = 0;
+		Integer doubleEmmenthal             = 0; 
+		Integer tripleEmmenthal             = 0; 
+		Integer noCheese                     = 0; 
+		Integer orderCount                     = 0; 
+		Integer productCount                 = 0;
+		
+		List<MenuRecipe> menuRecipeList = menuRecipeRepository.findAll();
+		
+		for(Order order : resultOrderList) {
+			orderCount ++;
+			for(Product product : order.getProducts()) {
+				if(product.getCategory().getId() == (long)1) {
+					productCount ++;
+				}
+				Integer cantHamburguesas     = 0;
+				Integer cheeseQuantity = 0;
+				boolean withoutCheese = false;
+				boolean cheddarFlag = true;
+				boolean alreadyAddedCheese = false;
+				
+				List<MenuRecipe> mr = menuRecipeList.stream().filter(s -> s.getCode().equals(product.getCode())).collect(Collectors.toList());
+				for(MenuRecipe m : mr) {
+					logger.info("Recipe found(product): code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
+					switch(m.getIdRecipe().intValue()) {
+					case 1:
+						cheeseQuantity += m.getQuantity();							
+						break;
+					case 2:
+						//El queso elegido es Emmenthal
+						cheddarFlag = false;
+						cheeseQuantity += m.getQuantity();
+						break;
+					case 3:
+						cantHamburguesas += m.getQuantity();
+						break;
+					case 4:
+						chips += m.getQuantity();
+						break;
+					}
+				}
+				
+				
+				if(!product.getExtras().isEmpty()) {
+					for(Extra extra : product.getExtras()) {
+						List<MenuRecipe> recipeCollected = menuRecipeList.stream().filter(s -> s.getCode().equals(extra.getCode())).collect(Collectors.toList());
+						for(MenuRecipe m : recipeCollected) {
+							logger.info("Recipe found(extra): code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
+							switch(m.getIdRecipe().intValue()) {
+							case 1:
+								if(m.getQuantity() == -1) {
+									withoutCheese = true;
+								}else if(m.getQuantity() == 0) {
+									cheddarFlag = false;
+								}else if(!alreadyAddedCheese) {
+									cheeseQuantity += m.getQuantity();
+									alreadyAddedCheese = true;
+								}
+								break;
+							case 2:
+								if(m.getQuantity() == -1) {
+									withoutCheese = true;
+								}else if(m.getQuantity() == 0) {
+									cheddarFlag = true;
+								}else if(!alreadyAddedCheese) {
+									cheeseQuantity += m.getQuantity();
+									alreadyAddedCheese = true;
+								}
+								break;
+							case 3:
+								cantHamburguesas += m.getQuantity();
+								break;
+							case 4:
+								chips += m.getQuantity();
+								break;
+							}
+							
+							
+						}
+					}					
+				}
+				
+				if(withoutCheese) {
+					cheeseQuantity = 0;
+				}
+				
+				grilledHamburger += cantHamburguesas;
+				
+				if(cheddarFlag) {
+					switch(cheeseQuantity) {
+					case 0://Sin queso
+						noCheese += cantHamburguesas;
+						break;
+					case 1://Queso simple
+						simpleCheddar += cantHamburguesas;
+						break;
+					case 2://Queso doble
+						doubleCheddar += cantHamburguesas;
+						break;
+					case 3://Queso triple
+						tripleCheddar += cantHamburguesas;
+						break;
+						
+					}					
+				}else {
+					switch(cheeseQuantity) {
+					case 0://Sin queso
+						noCheese += cantHamburguesas;
+						break;
+					case 1://Queso simple
+						simpleEmmenthal += cantHamburguesas;
+						break;
+					case 2://Queso doble
+						doubleEmmenthal += cantHamburguesas;
+						break;
+					case 3://Queso triple
+						tripleEmmenthal += cantHamburguesas;
+						break;
+						
+					}
+				}
+				
+			}
+		}
+		
+		kitchenResponse.setChips(chips);
+		kitchenResponse.setOrderCount(orderCount);
+		kitchenResponse.setProductCount(productCount);
+		kitchenResponse.setNoCheese(noCheese);
+		kitchenResponse.setGrilledHamburger(grilledHamburger);
+		kitchenResponse.setSimpleCheddar(simpleCheddar);
+		kitchenResponse.setDoubleCheddar(doubleCheddar);
+		kitchenResponse.setTripleCheddar(tripleCheddar);
+		kitchenResponse.setSimpleEmmenthal(simpleEmmenthal);
+		kitchenResponse.setDoubleEmmenthal(doubleEmmenthal);
+		kitchenResponse.setTripleEmmenthal(tripleEmmenthal);
+		kitchenResponse.setOrders(resultOrderList);
+		kitchenResponse.setStatus(HttpStatus.OK.value());
+		kitchenResponse.setCode(ResponseCode.FOUND.fieldNumber());
+		kitchenResponse.setMessage(ResponseCode.FOUND.fieldName());
+		
+		return HttpStatus.OK;
 	}
 		
 	public HttpStatus getAllCategories(CategoryResponse response) {
