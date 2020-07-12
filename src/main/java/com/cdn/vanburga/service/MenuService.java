@@ -201,7 +201,7 @@ public class MenuService {
 								}else if(m.getQuantity() == 0) {
 									cheddarFlag = false;
 								}else if(!alreadyAddedCheese) {
-									cheeseQuantity += m.getQuantity();
+									cheeseQuantity += m.getQuantity() * extra.getQuantity();
 									alreadyAddedCheese = true;
 								}
 								break;
@@ -211,15 +211,15 @@ public class MenuService {
 								}else if(m.getQuantity() == 0) {
 									cheddarFlag = true;
 								}else if(!alreadyAddedCheese) {
-									cheeseQuantity += m.getQuantity();
+									cheeseQuantity += m.getQuantity() * extra.getQuantity();
 									alreadyAddedCheese = true;
 								}
 								break;
 							case 3:
-								cantHamburguesas += m.getQuantity();
+								cantHamburguesas += m.getQuantity() * extra.getQuantity();
 								break;
 							case 4:
-								chips += m.getQuantity();
+								chips += m.getQuantity() * extra.getQuantity();
 								break;
 							}
 							
