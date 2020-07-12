@@ -1,5 +1,7 @@
 package com.cdn.vanburga.service;
 
+import static org.mockito.Mockito.validateMockitoUsage;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import com.cdn.vanburga.model.Category;
 import com.cdn.vanburga.model.Client;
 import com.cdn.vanburga.model.Extra;
 import com.cdn.vanburga.model.ExtraOrderDetail;
+import com.cdn.vanburga.model.KitchenStatus;
 import com.cdn.vanburga.model.MenuRecipe;
 import com.cdn.vanburga.model.Order;
 import com.cdn.vanburga.model.OrderDetail;
@@ -90,6 +93,7 @@ public class MenuService {
 	private MenuRecipeRepository menuRecipeRepository;
 	
 	private List<State> stateList;
+	
 	
 	public List<Extra>getExtras(){
 		return extraRepository.findAllByOrderByCode();
@@ -270,19 +274,20 @@ public class MenuService {
 				
 			}
 		}
+		kitchenResponse.setKitchenStatus(new KitchenStatus());
 		
-		kitchenResponse.setChips(chips);
-		kitchenResponse.setOrderCount(orderCount);
-		kitchenResponse.setProductCount(productCount);
-		kitchenResponse.setNoCheese(noCheese);
-		kitchenResponse.setGrilledHamburger(grilledHamburger);
-		kitchenResponse.setSimpleCheddar(simpleCheddar);
-		kitchenResponse.setDoubleCheddar(doubleCheddar);
-		kitchenResponse.setTripleCheddar(tripleCheddar);
-		kitchenResponse.setSimpleEmmenthal(simpleEmmenthal);
-		kitchenResponse.setDoubleEmmenthal(doubleEmmenthal);
-		kitchenResponse.setTripleEmmenthal(tripleEmmenthal);
-		kitchenResponse.setOrders(resultOrderList);
+		kitchenResponse.getKitchenStatus().setChips(chips);
+		kitchenResponse.getKitchenStatus().setOrderCount(orderCount);
+		kitchenResponse.getKitchenStatus().setProductCount(productCount);
+		kitchenResponse.getKitchenStatus().setNoCheese(noCheese);
+		kitchenResponse.getKitchenStatus().setGrilledHamburger(grilledHamburger);
+		kitchenResponse.getKitchenStatus().setSimpleCheddar(simpleCheddar);
+		kitchenResponse.getKitchenStatus().setDoubleCheddar(doubleCheddar);
+		kitchenResponse.getKitchenStatus().setTripleCheddar(tripleCheddar);
+		kitchenResponse.getKitchenStatus().setSimpleEmmenthal(simpleEmmenthal);
+		kitchenResponse.getKitchenStatus().setDoubleEmmenthal(doubleEmmenthal);
+		kitchenResponse.getKitchenStatus().setTripleEmmenthal(tripleEmmenthal);
+		kitchenResponse.getKitchenStatus().setOrders(resultOrderList);
 		kitchenResponse.setStatus(HttpStatus.OK.value());
 		kitchenResponse.setCode(ResponseCode.FOUND.fieldNumber());
 		kitchenResponse.setMessage(ResponseCode.FOUND.fieldName());
@@ -387,9 +392,7 @@ public class MenuService {
 		BigDecimal totalAmount = new BigDecimal(0);
 		
 		try {
-			validateOrderRequestCreate(orderRequest);
-		
-		
+			validateOrderRequestCreate(orderRequest);		
 			//REGISTRA CLIENTE
 			Client client = new Client();
 			client.setName(orderRequest.getClient().getName() + " " + orderRequest.getClient().getLastName());
