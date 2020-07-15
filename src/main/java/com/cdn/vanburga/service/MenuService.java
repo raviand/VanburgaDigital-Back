@@ -466,9 +466,12 @@ public class MenuService {
 			whatsappLinkOrder.setId(order.getId());
 			String wppLink = getVanburgaWhatsappLink(whatsappLinkOrder);
 			order.setWhatsappLink(wppLink);
+			logger.info("1");
 			order = orderRepository.save(order);
-			order.setWhatsappLink(getClientWhatsappLink(order));
-			//Formo la respuesta del servicio
+			logger.info("2");
+			order.setWhatsappLink(getClientWhatsappLink(whatsappLinkOrder));
+			logger.info("3");
+			//Formo la respuesta del servicios
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
 			orderResponse.setProducts(orderRequest.getProducts());
@@ -874,7 +877,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	            message += "🚗 Elegiste que te entreguemos el pedido en la siguiente dirección: \n";
 	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
 	        }else {
-	        	message += "Elegiste retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58";
+	        	message += "Elegiste retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58" + "\n";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
 	        if(!order.getComments().isBlank()) {
@@ -887,7 +890,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	}
 	
 	private String getClientWhatsappLink(Order order) throws UnsupportedEncodingException {
-		 String message = "Hola Vanburga! Soy" + order.getClient().getName() + "! Mi orden es la Nº " + order.getId() + ":\n";
+		 String message = "Hola Vanburga! Soy " + order.getClient().getName() + "! Mi orden es la Nº " + order.getId() + ":\n";
 	        for(Product pd : order.getProducts()) {
 	            switch (pd.getCategory().getName()) {
 	            case "Burgers":
@@ -911,7 +914,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	            message += "🚗 Elegí que me entreguen el pedido en la siguiente dirección: \n";
 	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
 	        }else {
-	        	message += "Elegí retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58";
+	        	message += "Elegí retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58"+"\n";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
 	        if(!order.getComments().isBlank()) {
