@@ -2,7 +2,10 @@ package com.cdn.vanburga.service;
 
 import static org.mockito.Mockito.validateMockitoUsage;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -390,6 +393,7 @@ public class MenuService {
 		
 		logger.info("Creating order");
 		BigDecimal totalAmount = new BigDecimal(0);
+		Order whatsappLinkOrder = new Order();
 		
 		try {
 			validateOrderRequestCreate(orderRequest);		
@@ -399,6 +403,7 @@ public class MenuService {
 			client.setMail(orderRequest.getClient().getMail());
 			client.setCellphone(orderRequest.getClient().getCellphone());
 			client = clientRepository.save(client);
+			whatsappLinkOrder.setClient(client);
 			
 			//Registra la direccion
 			Address address = new Address();
@@ -414,6 +419,7 @@ public class MenuService {
 				address.setStreet(orderRequest.getClient().getAddress().getStreet());
 				address.setReference(orderRequest.getClient().getAddress().getReference());
 				address = addressRepository.save(address);
+				whatsappLinkOrder.getClient().setAddress(address);;
 				totalAmount.add(address.getState().getAmount());
 			}
 			
@@ -421,8 +427,11 @@ public class MenuService {
 			Order order = new Order();
 			order.setClient(client);
 			order.setDelivery(orderRequest.getDelivery());
+			whatsappLinkOrder.setDelivery(orderRequest.getDelivery());
 			order.setComments(orderRequest.getComment());
+			whatsappLinkOrder.setComments(orderRequest.getComment());
 			order.setPaymentType(orderRequest.getPaymentType());
+			whatsappLinkOrder.setPaymentType(orderRequest.getPaymentType());
 			order.setCreateDate(LocalDateTime.now());
 			order.setAmount(new BigDecimal(0));
 			//Calcular monto total de la orden
@@ -431,6 +440,7 @@ public class MenuService {
 			//Registra los productos y por cada producto, sus extras
 			
 			//List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+			whatsappLinkOrder.setProducts(orderRequest.getProducts());
 			for(Product pd : orderRequest.getProducts()) {
 				OrderDetail orderDetail = new OrderDetail();
 				orderDetail.setOrder(order);
@@ -450,10 +460,14 @@ public class MenuService {
 				}
 			}
 			//Registro el monto total del pedido
+			whatsappLinkOrder.setAmount(totalAmount);
 			order.setAmount(totalAmount);
 			order.setStatus(OrderConstant.PENDING);
 			order = orderRepository.save(order);
-			
+			whatsappLinkOrder.setId(order.getId());
+			String wppLink = getWhatsappLink(whatsappLinkOrder);
+			order.setWhatsappLink(wppLink);
+			order = orderRepository.save(order);
 			
 			//Formo la respuesta del servicio
 			orderResponse.setAddress(address);
@@ -836,18 +850,15 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 		}
 	}
 	
-	private String getWhatsappLink(Order order) {
-		 String message = "Hola " + order.getClient().getName() + "! Nos llegó tu pedido Nº " + order.getId() + ":\n";
+	private String getWhatsappLink(Order order) throws UnsupportedEncodingException {
+		 String message = "Hola " + order.getClient().getName() + "! Nos llegó la orden Nº " + order.getId() + ":\n";
 	        for(Product pd : order.getProducts()) {
 	            switch (pd.getCategory().getName()) {
 	            case "Burgers":
-	                message += ":hamburger: ";
+	                message += "🍔 ";
 	                break;
-	            case "Bebidas":
-	                message += ":beer: ";
-	                break;
-	            case "Acompañamientos":
-	                message += ":fries: ";
+	            case "Bebidas y otros":
+	                message += "🍺 ";
 	                break;
 	            default:
 	                message += " - ";
@@ -855,19 +866,21 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	            message += pd.getName() + "\n";
 	            if (pd.getExtras() != null && !pd.getExtras().isEmpty()) {
 	                for (Extra ex : pd.getExtras()) {
-	                    message += "\t * " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                    message += "\t ⚫ " + ex.getName() +" x"+ex.getQuantity() + "\n";
 	                }
 	            }
 	        }
 	        message += "\n ";
 	        if (order.getDelivery()) {
-	            message += ":red_car: Elegiste que te entreguemos el pedido en la siguiente dirección: \n";
+	            message += "🚗 Elegiste que te entreguemos el pedido en la siguiente dirección: \n";
 	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
-	        message += ":notepad_spiral: Comentarios adicionales: " + order.getComments() + "\n\n";
+	        message += "🗒️ Comentarios adicionales: " + order.getComments() + "\n\n";
 	        message += "Gracias por confiar en Vanburga!";
-	        return message;
+	        String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
+			String link = "https://wa.me/549"+order.getClient().getCellphone()+"/?text="+path;
+	        return link;
 	}
 
 	

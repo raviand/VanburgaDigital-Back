@@ -45,6 +45,8 @@ public class Order {
 	
 	private LocalDateTime createDate;
 	
+	private String whatsappLink;
+	
 	private BigDecimal amount;
 	
 	private Boolean delivery;
