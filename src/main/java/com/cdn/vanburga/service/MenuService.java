@@ -440,7 +440,6 @@ public class MenuService {
 			//Registra los productos y por cada producto, sus extras
 			
 			//List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
-			whatsappLinkOrder.setProducts(orderRequest.getProducts());
 			for(Product pd : orderRequest.getProducts()) {
 				OrderDetail orderDetail = new OrderDetail();
 				orderDetail.setOrder(order);
@@ -460,15 +459,15 @@ public class MenuService {
 				}
 			}
 			//Registro el monto total del pedido
+			whatsappLinkOrder.setProducts(orderRequest.getProducts());
 			whatsappLinkOrder.setAmount(totalAmount);
 			order.setAmount(totalAmount);
 			order.setStatus(OrderConstant.PENDING);
-			order = orderRepository.save(order);
 			whatsappLinkOrder.setId(order.getId());
-			String wppLink = getWhatsappLink(whatsappLinkOrder);
+			String wppLink = getVanburgaWhatsappLink(whatsappLinkOrder);
 			order.setWhatsappLink(wppLink);
 			order = orderRepository.save(order);
-			
+			order.setWhatsappLink(getClientWhatsappLink(order));
 			//Formo la respuesta del servicio
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
@@ -850,7 +849,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 		}
 	}
 	
-	private String getWhatsappLink(Order order) throws UnsupportedEncodingException {
+	private String getVanburgaWhatsappLink(Order order) throws UnsupportedEncodingException {
 		 String message = "Hola " + order.getClient().getName() + "! Nos llegó la orden Nº " + order.getId() + ":\n";
 	        for(Product pd : order.getProducts()) {
 	            switch (pd.getCategory().getName()) {
@@ -874,10 +873,51 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	        if (order.getDelivery()) {
 	            message += "🚗 Elegiste que te entreguemos el pedido en la siguiente dirección: \n";
 	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
+	        }else {
+	        	message += "Elegiste retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
-	        message += "🗒️ Comentarios adicionales: " + order.getComments() + "\n\n";
+	        if(!order.getComments().isBlank()) {
+	        	message += "🗒️ Comentarios adicionales: " + order.getComments() + "\n\n";
+	        }
 	        message += "Gracias por confiar en Vanburga!";
+	        String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
+			String link = "https://wa.me/549"+order.getClient().getCellphone()+"/?text="+path;
+	        return link;
+	}
+	
+	private String getClientWhatsappLink(Order order) throws UnsupportedEncodingException {
+		 String message = "Hola Vanburga! Soy" + order.getClient().getName() + "! Mi orden es la Nº " + order.getId() + ":\n";
+	        for(Product pd : order.getProducts()) {
+	            switch (pd.getCategory().getName()) {
+	            case "Burgers":
+	                message += "🍔 ";
+	                break;
+	            case "Bebidas y otros":
+	                message += "🍺 ";
+	                break;
+	            default:
+	                message += " - ";
+	            }
+	            message += pd.getName() + "\n";
+	            if (pd.getExtras() != null && !pd.getExtras().isEmpty()) {
+	                for (Extra ex : pd.getExtras()) {
+	                    message += "\t ⚫ " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                }
+	            }
+	        }
+	        message += "\n ";
+	        if (order.getDelivery()) {
+	            message += "🚗 Elegí que me entreguen el pedido en la siguiente dirección: \n";
+	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
+	        }else {
+	        	message += "Elegí retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58";
+	        }
+	        message += "Forma de pago: " + order.getPaymentType() + "\n";
+	        if(!order.getComments().isBlank()) {
+	        	message += "🗒️ Comentarios adicionales: " + order.getComments() + "\n\n";
+	        }
+	        //message += "Gracias por confiar en Vanburga!";
 	        String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
 			String link = "https://wa.me/549"+order.getClient().getCellphone()+"/?text="+path;
 	        return link;
