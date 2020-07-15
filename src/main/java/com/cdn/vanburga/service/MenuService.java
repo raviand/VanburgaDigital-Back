@@ -835,6 +835,40 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 			
 		}
 	}
+	
+	private String getWhatsappLink(Order order) {
+		 String message = "Hola " + order.getClient().getName() + "! Nos llegó tu pedido Nº " + order.getId() + ":\n";
+	        for(Product pd : order.getProducts()) {
+	            switch (pd.getCategory().getName()) {
+	            case "Burgers":
+	                message += ":hamburger: ";
+	                break;
+	            case "Bebidas":
+	                message += ":beer: ";
+	                break;
+	            case "Acompañamientos":
+	                message += ":fries: ";
+	                break;
+	            default:
+	                message += " - ";
+	            }
+	            message += pd.getName() + "\n";
+	            if (pd.getExtras() != null && !pd.getExtras().isEmpty()) {
+	                for (Extra ex : pd.getExtras()) {
+	                    message += "\t * " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                }
+	            }
+	        }
+	        message += "\n ";
+	        if (order.getDelivery()) {
+	            message += ":red_car: Elegiste que te entreguemos el pedido en la siguiente dirección: \n";
+	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
+	        }
+	        message += "Forma de pago: " + order.getPaymentType() + "\n";
+	        message += ":notepad_spiral: Comentarios adicionales: " + order.getComments() + "\n\n";
+	        message += "Gracias por confiar en Vanburga!";
+	        return message;
+	}
 
 	
 }
