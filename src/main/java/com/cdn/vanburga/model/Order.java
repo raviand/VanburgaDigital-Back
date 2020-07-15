@@ -16,17 +16,20 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
 @Table(name = "`Order`")
 @JsonInclude(Include.NON_NULL)
-public class Order {
+@EqualsAndHashCode(callSuper=false)
+public class Order implements Cloneable{
 
 	@Id
 	@GeneratedValue(
@@ -57,5 +60,15 @@ public class Order {
 	
 	@Transient
 	private List<Product> products;
+	
+	public Object clone(){
+        Object obj=null;
+        try{
+            obj=super.clone();
+        }catch(CloneNotSupportedException ex){
+            System.out.println(" no se puede duplicar");
+        }
+        return obj;
+    }
 	
 }

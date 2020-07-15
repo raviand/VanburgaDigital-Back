@@ -420,7 +420,7 @@ public class MenuService {
 				address.setReference(orderRequest.getClient().getAddress().getReference());
 				address = addressRepository.save(address);
 				whatsappLinkOrder.getClient().setAddress(address);;
-				totalAmount.add(address.getState().getAmount());
+				totalAmount = totalAmount.add(address.getState().getAmount());
 			}
 			
 			//Crea la orden de pedido
@@ -442,35 +442,46 @@ public class MenuService {
 			//List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
 			for(Product pd : orderRequest.getProducts()) {
 				OrderDetail orderDetail = new OrderDetail();
-				orderDetail.setOrder(order);
-				orderDetail.setProduct(pd);
+				Optional<Product> product = productRepository.findById(pd.getId());
+				if(!product.isPresent()) throw new ServiceException();
+				Product prod =product.get();
 				
-				totalAmount = totalAmount.add(pd.getPrice());
+				orderDetail.setOrder(order);
+				orderDetail.setProduct(prod);
+				
+				totalAmount = totalAmount.add(prod.getPrice());
 				orderDetail = orderDetailRepository.save(orderDetail);
 				if(pd.getExtras() != null && !pd.getExtras().isEmpty()) {				
 					for(Extra e : pd.getExtras()) {
+						Optional<Extra> ex = extraRepository.findById(e.getId());
+						if(!ex.isPresent()) throw new ServiceException();
+						Extra extra = ex.get();
+						
+						
 						ExtraOrderDetail extraOrder = new ExtraOrderDetail();
-						extraOrder.setExtra(e);
+						extraOrder.setExtra(extra);
 						extraOrder.setOrderDetail(orderDetail);
 						extraOrder.setQuantity(e.getQuantity());
-						totalAmount = totalAmount.add(e.getPrice());
+						totalAmount = totalAmount.add(extra.getPrice().multiply(new BigDecimal(e.getQuantity().longValue())));
 						extraOrder = extraOrderDetailRepository.save(extraOrder);
 					}
 				}
 			}
+			OrderResponse response = new OrderResponse();
+			getOrder(order.getId(), response);
+			
+			
 			//Registro el monto total del pedido
-			whatsappLinkOrder.setProducts(orderRequest.getProducts());
+			whatsappLinkOrder.setProducts(response.getOrder().getProducts());
 			whatsappLinkOrder.setAmount(totalAmount);
 			order.setAmount(totalAmount);
 			order.setStatus(OrderConstant.PENDING);
 			whatsappLinkOrder.setId(order.getId());
 			String wppLink = getVanburgaWhatsappLink(whatsappLinkOrder);
 			order.setWhatsappLink(wppLink);
-			logger.info("1");
 			order = orderRepository.save(order);
-			logger.info("2");
+			order = (Order) order.clone();
 			order.setWhatsappLink(getClientWhatsappLink(whatsappLinkOrder));
-			logger.info("3");
 			//Formo la respuesta del servicios
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
@@ -485,7 +496,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.MISSING_FIELD.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.MISSING_FIELD.fieldName() + e1.getDescriptionString());
-			logger.error("MissingFieldException: " + e1.getDescriptionString());
+			logger.error("MissingFieldException: ", e1);
 			return HttpStatus.BAD_REQUEST;
 		
 		}catch (ServiceException e1) {
@@ -493,7 +504,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
-			logger.error("ServiceException: " + e1.getDescriptionString());
+			logger.error("ServiceException: " , e1);
 			return HttpStatus.BAD_REQUEST;
 			
 		} catch(Exception e) {
@@ -501,7 +512,7 @@ public class MenuService {
 			orderResponse.setCode(ResponseCode.ERROR_PROCESS.fieldNumber());
 			orderResponse.setStatus(HttpStatus.BAD_REQUEST.value());
 			orderResponse.setMessage(ResponseCode.ERROR_PROCESS.fieldName());
-			logger.error("Exception: " + e.getMessage());
+			logger.error("Exception: " , e);
 			return HttpStatus.BAD_REQUEST;
 			
 		}
@@ -880,7 +891,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	        	message += "Elegiste retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58" + "\n";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
-	        if(!order.getComments().isBlank()) {
+	        if(order.getComments() != null && !order.getComments().trim().isEmpty()) {
 	        	message += "🗒️ Comentarios adicionales: " + order.getComments() + "\n\n";
 	        }
 	        message += "Gracias por confiar en Vanburga!";
@@ -917,7 +928,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	        	message += "Elegí retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58"+"\n";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
-	        if(!order.getComments().isBlank()) {
+	        if(order.getComments() != null && !order.getComments().trim().isEmpty()) {
 	        	message += "🗒️ Comentarios adicionales: " + order.getComments() + "\n\n";
 	        }
 	        //message += "Gracias por confiar en Vanburga!";

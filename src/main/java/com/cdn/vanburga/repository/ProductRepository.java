@@ -10,4 +10,5 @@ import com.cdn.vanburga.model.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	Optional<List<Product>> findByCategory(Category category);
+	
 }
