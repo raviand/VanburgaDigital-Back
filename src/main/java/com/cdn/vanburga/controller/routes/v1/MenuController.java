@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cdn.vanburga.controller.routes.MenuControllerInterface;
+import com.cdn.vanburga.model.BusinessSchedule;
 import com.cdn.vanburga.model.Extra;
 import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.User;
@@ -196,6 +197,10 @@ public class MenuController implements MenuControllerInterface{
 	 */
 	public ResponseEntity<List<Extra>> getExtras(HttpServletRequest request){
 		return ResponseEntity.status(HttpStatus.OK).body(menuService.getExtras());
+	}
+	
+	public ResponseEntity<List<BusinessSchedule>> getBusinessSchedule(HttpServletRequest request){
+		return ResponseEntity.status(HttpStatus.OK).body(menuService.getBusinessSchedule());
 	}
 
 }

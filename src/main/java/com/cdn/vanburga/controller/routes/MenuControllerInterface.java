@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.cdn.vanburga.model.BusinessSchedule;
 import com.cdn.vanburga.model.Extra;
 import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.User;
@@ -43,6 +44,9 @@ public interface MenuControllerInterface {
 	
 	@GetMapping(path = "/extra", produces = (MediaType.APPLICATION_JSON_VALUE))
 	public ResponseEntity<List<Extra>> getExtras(HttpServletRequest request);
+	
+	@GetMapping(path = "/BusinessSchedule", produces = (MediaType.APPLICATION_JSON_VALUE))
+	public ResponseEntity<List<BusinessSchedule>> getBusinessSchedule(HttpServletRequest request);
 	
 	/**********************************************************************
 	 * endpoints de Kitchen (OH YEAH BABY!)
