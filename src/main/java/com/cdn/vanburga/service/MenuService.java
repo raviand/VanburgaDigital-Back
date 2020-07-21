@@ -865,7 +865,10 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	
 	private String getVanburgaWhatsappLink(Order order) throws UnsupportedEncodingException {
 		 String message = "Hola " + order.getClient().getName() + "! Nos llegó la orden Nº " + order.getId() + ":\n";
-	        for(Product pd : order.getProducts()) {
+		 for(Product pd : order.getProducts()) {
+	        	String extras = "";
+	        	String burgerQualifier = "";
+	        	
 	            switch (pd.getCategory().getName()) {
 	            case "Burgers":
 	                message += "🍔 ";
@@ -876,12 +879,32 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	            default:
 	                message += " - ";
 	            }
-	            message += pd.getName() + "\n";
+	            message += pd.getName();
 	            if (pd.getExtras() != null && !pd.getExtras().isEmpty()) {
 	                for (Extra ex : pd.getExtras()) {
-	                    message += "\t ⚫ " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                	 if(ex.getId() == 6) {
+	                		 switch (ex.getQuantity()) {
+	                		 case 1:
+	                			 burgerQualifier = " doble ";
+	                			 break;
+	                		 case 2:
+	                			 burgerQualifier = " triple";
+	                			 break;
+	                		 case 3:
+	                			 burgerQualifier = " cuádruple";
+	                			 break;
+	                		default:
+	                			 burgerQualifier = " cuádruple";
+	                			 extras += "\t ⚫ " + ex.getName() +" x"+ (ex.getQuantity()-3) + "\n";
+	                			 break;
+	                		 }
+	                	 }else {
+	                		 extras += "\t ⚫ " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                	 }
 	                }
-	            }
+	        }
+	            message += burgerQualifier + "\n";
+	            message += extras;
 	        }
 	        message += "\n ";
 	        if (order.getDelivery()) {
@@ -903,6 +926,9 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	private String getClientWhatsappLink(Order order) throws UnsupportedEncodingException {
 		 String message = "Hola Vanburga! Soy " + order.getClient().getName() + "! Mi orden es la Nº " + order.getId() + ":\n";
 	        for(Product pd : order.getProducts()) {
+	        	String extras = "";
+	        	String burgerQualifier = "";
+	        	
 	            switch (pd.getCategory().getName()) {
 	            case "Burgers":
 	                message += "🍔 ";
@@ -913,12 +939,32 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	            default:
 	                message += " - ";
 	            }
-	            message += pd.getName() + "\n";
+	            message += pd.getName();
 	            if (pd.getExtras() != null && !pd.getExtras().isEmpty()) {
 	                for (Extra ex : pd.getExtras()) {
-	                    message += "\t ⚫ " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                	 if(ex.getId() == 6) {
+	                		 switch (ex.getQuantity()) {
+	                		 case 1:
+	                			 burgerQualifier = " doble ";
+	                			 break;
+	                		 case 2:
+	                			 burgerQualifier = " triple";
+	                			 break;
+	                		 case 3:
+	                			 burgerQualifier = " cuádruple";
+	                			 break;
+	                		default:
+	                			 burgerQualifier = " cuádruple";
+	                			 extras += "\t ⚫ " + ex.getName() +" x"+ (ex.getQuantity()-3) + "\n";
+	                			 break;
+	                		 }
+	                	 }else {
+	                		 extras += "\t ⚫ " + ex.getName() +" x"+ex.getQuantity() + "\n";
+	                	 }
 	                }
-	            }
+	        }
+	            message += burgerQualifier + "\n";
+	            message += extras;
 	        }
 	        message += "\n ";
 	        if (order.getDelivery()) {
@@ -933,9 +979,9 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	        }
 	        //message += "Gracias por confiar en Vanburga!";
 	        String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
-			String link = "https://wa.me/549"+order.getClient().getCellphone()+"/?text="+path;
+			String link = "https://wa.me/5491168929067/?text="+path;
 	        return link;
 	}
 
 	
-}
+	}
