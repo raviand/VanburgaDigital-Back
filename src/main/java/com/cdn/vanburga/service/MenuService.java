@@ -1128,7 +1128,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	        }
 	        //message += "Gracias por confiar en Vanburga!";
 	        String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
-			String link = "https://wa.me/5491168929067/?text="+path;
+			String link = "https://wa.me/5491157690039/?text="+path;
 	        return link;
 	}
 
