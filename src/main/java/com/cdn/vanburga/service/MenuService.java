@@ -7,8 +7,11 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,7 @@ import com.cdn.vanburga.model.Order;
 import com.cdn.vanburga.model.OrderDetail;
 import com.cdn.vanburga.model.Product;
 import com.cdn.vanburga.model.ProductExtra;
+import com.cdn.vanburga.model.ScheduleResume;
 import com.cdn.vanburga.model.State;
 import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
@@ -45,6 +49,7 @@ import com.cdn.vanburga.model.response.KitchenResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductData;
 import com.cdn.vanburga.model.response.ProductResponse;
+import com.cdn.vanburga.model.response.ScheduleResponse;
 import com.cdn.vanburga.repository.AddressRepository;
 import com.cdn.vanburga.repository.BusinesScheduleRepository;
 import com.cdn.vanburga.repository.CategoryRepository;
@@ -109,6 +114,141 @@ public class MenuService {
 	
 	public List<BusinessSchedule> getBusinessSchedule(){
 		return businessRepository.findAll();
+	}
+	
+	public HttpStatus getScheduleResume(ScheduleResponse scheduleResponse) {
+		LocalDateTime from = LocalDateTime.now().minusDays(1);
+		LocalDateTime to = LocalDateTime.now();
+		Optional<List<Order>> orderList = orderRepository.findByParameters(from, to, OrderConstant.CONFIRM, null, null, null, null);
+		
+		if(!orderList.isPresent()) {
+			scheduleResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
+			scheduleResponse.setCode(ResponseCode.NOT_FOUND.fieldNumber());
+			scheduleResponse.setStatus(HttpStatus.OK.value());
+			logger.warn("No orders found");
+			return HttpStatus.OK;
+		}
+		
+		Map<String, List<Order>> mapOrder = new HashMap<String,List<Order>>();
+		/*********************************************************
+		 * 
+		 *			Por cada horario de entrega, hago una lista de ordenes en el mapa
+		 */
+		for(Order order : orderList.get()) {
+			if(mapOrder.get(order.getDeliverTime()) == null) {
+				List<Order> auxOrderList = new ArrayList<Order>();
+				auxOrderList.add(order);
+				mapOrder.put(order.getDeliverTime(), auxOrderList);
+			}else {
+				List<Order> auxOrderList = mapOrder.get(order.getDeliverTime());
+				auxOrderList.add(order);
+				mapOrder.put(order.getDeliverTime(), auxOrderList);
+			}
+		}
+		
+		/*********************************************************
+		 * 
+		 *			Lleno las ordenes con sus datos (productos, extras..)
+		 */
+		for (String hour : mapOrder.keySet()) {
+			List<Order> resultOrderList = new ArrayList<Order>();
+			for(Order order : mapOrder.get(hour)) {
+				Optional<List<OrderDetail>> orderDetailList = orderDetailRepository.findByOrder(order);
+				Optional<List<ExtraOrderDetail>> extraOrderDetailList = extraOrderDetailRepository.findByOrder(order);
+				List<Extra> extras = new ArrayList<Extra>();
+				List<Product> productDataList = new ArrayList<Product>();
+				if(orderDetailList.isPresent()) {
+					for (OrderDetail od : orderDetailList.get()) {
+						if(extraOrderDetailList.isPresent()) {
+							for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
+								if(ex.getOrderDetail().getId() == od.getId()) {
+									ex.getExtra().setQuantity(ex.getQuantity());
+									extras.add(ex.getExtra());
+								}
+								//Por cada extra...
+							}
+						}
+						//Por cada producto...
+						od.getProduct().setExtras(extras);
+						productDataList.add(od.getProduct());
+					}
+					
+				}
+				//Por cada orden...
+				order.setProducts(productDataList);
+				resultOrderList.add(order);
+			}
+			mapOrder.put(hour, resultOrderList);
+		}
+		
+		/*********************************************************
+		 * 
+		 *			Contabilizo en funcion del horario
+		 */
+		/*********************************************/
+		List<MenuRecipe> menuRecipeList = menuRecipeRepository.findAll();
+		List<ScheduleResume> scheduleResume = new ArrayList<ScheduleResume>();
+		for (String hour : mapOrder.keySet()) {
+			/*********************************************/
+			Integer chips                         = 0; 
+			Integer grilledHamburger             = 0; 
+			Integer orderCount                     = 0; 
+			Integer productCount                 = 0;
+			/*********************************************/
+			for(Order order : mapOrder.get(hour)) {
+				orderCount ++;
+				for(Product product : order.getProducts()) {
+					if(product.getCategory().getId() == (long)1) {
+						productCount ++;
+					}
+					Integer cantHamburguesas     = 0;
+					
+					List<MenuRecipe> mr = menuRecipeList.stream().filter(s -> s.getCode().equals(product.getCode())).collect(Collectors.toList());
+					for(MenuRecipe m : mr) {
+						logger.info("Recipe found(product): code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
+						switch(m.getIdRecipe().intValue()) {
+						case 3:
+							cantHamburguesas += m.getQuantity();
+							break;
+						case 4:
+							chips += m.getQuantity();
+							break;
+						}
+					}
+					
+					if(!product.getExtras().isEmpty()) {
+						for(Extra extra : product.getExtras()) {
+							List<MenuRecipe> recipeCollected = menuRecipeList.stream().filter(s -> s.getCode().equals(extra.getCode())).collect(Collectors.toList());
+							for(MenuRecipe m : recipeCollected) {
+								logger.info("Recipe found(extra): code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
+								switch(m.getIdRecipe().intValue()) {
+								case 3:
+									cantHamburguesas += m.getQuantity() * extra.getQuantity();
+									break;
+								case 4:
+									chips += m.getQuantity() * extra.getQuantity();
+									break;
+								}
+							}
+						}					
+					}
+					grilledHamburger += cantHamburguesas;
+				}
+			}
+			ScheduleResume auxSchedule = new ScheduleResume();
+			auxSchedule.setChips(chips);
+			auxSchedule.setGrilledHamburguer(grilledHamburger);
+			auxSchedule.setHour(hour);
+			auxSchedule.setOrderCount(orderCount);
+			auxSchedule.setProductCount(productCount);
+			scheduleResume.add(auxSchedule);
+		}
+		scheduleResponse.setScheduleResume(scheduleResume);
+		scheduleResponse.setStatus(HttpStatus.OK.value());
+		scheduleResponse.setCode(ResponseCode.FOUND.fieldNumber());
+		scheduleResponse.setMessage(ResponseCode.FOUND.fieldName());
+		
+		return HttpStatus.OK;
 	}
 	
 	public HttpStatus getKitchen(KitchenResponse kitchenResponse) {
