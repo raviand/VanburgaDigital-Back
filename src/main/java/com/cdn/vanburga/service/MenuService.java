@@ -27,6 +27,7 @@ import com.cdn.vanburga.exception.FieldTypeException;
 import com.cdn.vanburga.exception.MissingFieldException;
 import com.cdn.vanburga.exception.ServiceException;
 import com.cdn.vanburga.model.Address;
+import com.cdn.vanburga.model.BusinessSchedule;
 import com.cdn.vanburga.model.Category;
 import com.cdn.vanburga.model.Client;
 import com.cdn.vanburga.model.Extra;
@@ -45,6 +46,7 @@ import com.cdn.vanburga.model.response.OrderResponse;
 import com.cdn.vanburga.model.response.ProductData;
 import com.cdn.vanburga.model.response.ProductResponse;
 import com.cdn.vanburga.repository.AddressRepository;
+import com.cdn.vanburga.repository.BusinesScheduleRepository;
 import com.cdn.vanburga.repository.CategoryRepository;
 import com.cdn.vanburga.repository.ClientRepository;
 import com.cdn.vanburga.repository.ExtraOrderDetailRepository;
@@ -95,11 +97,18 @@ public class MenuService {
 	@Autowired @Lazy
 	private MenuRecipeRepository menuRecipeRepository;
 	
+	@Autowired @Lazy
+	private BusinesScheduleRepository businessRepository;
+	
 	private List<State> stateList;
 	
 	
 	public List<Extra>getExtras(){
 		return extraRepository.findAllByOrderByCode();
+	}
+	
+	public List<BusinessSchedule> getBusinessSchedule(){
+		return businessRepository.findAll();
 	}
 	
 	public HttpStatus getKitchen(KitchenResponse kitchenResponse) {
@@ -112,9 +121,9 @@ public class MenuService {
 		if(!orderList.isPresent()) {
 			kitchenResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
 			kitchenResponse.setCode(ResponseCode.NOT_FOUND.fieldNumber());
-			kitchenResponse.setStatus(HttpStatus.NOT_FOUND.value());
+			kitchenResponse.setStatus(HttpStatus.OK.value());
 			logger.warn("No orders found");
-			return HttpStatus.NOT_FOUND;
+			return HttpStatus.OK;
 		}
 		
 		List<Order> resultOrderList = new ArrayList<Order>();
@@ -718,9 +727,9 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 			if(!orderList.isPresent()) {
 				orderResponse.setMessage(ResponseCode.NOT_FOUND.fieldName());
 				orderResponse.setCode(ResponseCode.NOT_FOUND.fieldNumber());
-				orderResponse.setStatus(HttpStatus.NOT_FOUND.value());
+				orderResponse.setStatus(HttpStatus.OK.value());
 				logger.warn("No orders found");
-				return HttpStatus.NOT_FOUND;
+				return HttpStatus.OK;
 			}
 			
 			List<Order> resultOrderList = new ArrayList<Order>();
