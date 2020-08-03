@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "productByExtra")
+@Table(name = "ProductByExtra")
 public class ProductExtra {
 
 	@EmbeddedId

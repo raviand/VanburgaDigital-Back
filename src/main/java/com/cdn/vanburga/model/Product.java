@@ -21,7 +21,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Product {
+public class Product implements Cloneable{
 
 	@Id
 	private Long id;
@@ -53,4 +53,14 @@ public class Product {
 	public Product(Long id) {
 		this.id = id;
 	}
+	
+	public Object clone(){
+        Object obj=null;
+        try{
+            obj=super.clone();
+        }catch(CloneNotSupportedException ex){
+            System.out.println(" no se puede duplicar");
+        }
+        return obj;
+    }
 }

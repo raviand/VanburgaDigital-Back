@@ -1,14 +1,12 @@
 package com.cdn.vanburga.service;
 
-import static org.mockito.Mockito.validateMockitoUsage;
-
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +45,6 @@ import com.cdn.vanburga.model.request.OrderRequest;
 import com.cdn.vanburga.model.response.CategoryResponse;
 import com.cdn.vanburga.model.response.KitchenResponse;
 import com.cdn.vanburga.model.response.OrderResponse;
-import com.cdn.vanburga.model.response.ProductData;
 import com.cdn.vanburga.model.response.ProductResponse;
 import com.cdn.vanburga.model.response.ScheduleResponse;
 import com.cdn.vanburga.repository.AddressRepository;
@@ -63,7 +60,6 @@ import com.cdn.vanburga.repository.ProductExtraRepository;
 import com.cdn.vanburga.repository.ProductRepository;
 import com.cdn.vanburga.repository.StateRepository;
 import com.cdn.vanburga.util.LocalDateTimeAttributeConverter;
-import com.mysql.cj.Constants;
 
 @Service
 public class MenuService {
@@ -243,6 +239,7 @@ public class MenuService {
 			auxSchedule.setProductCount(productCount);
 			scheduleResume.add(auxSchedule);
 		}
+		scheduleResume.sort(Comparator.comparing(ScheduleResume::getHour));
 		scheduleResponse.setScheduleResume(scheduleResume);
 		scheduleResponse.setStatus(HttpStatus.OK.value());
 		scheduleResponse.setCode(ResponseCode.FOUND.fieldNumber());
@@ -268,46 +265,23 @@ public class MenuService {
 		
 		List<Order> resultOrderList = new ArrayList<Order>();
 		for(Order order : orderList.get()) {
-			Optional<Address> address = addressRepository.findByClient(order.getClient()); 
-			Optional<List<OrderDetail>> orderDetailList = orderDetailRepository.findByOrder(order);
-			Optional<List<ExtraOrderDetail>> extraOrderDetailList = extraOrderDetailRepository.findByOrder(order);
-			List<Extra> extras = new ArrayList<Extra>();
-			List<Product> productDataList = new ArrayList<Product>();
-			if(orderDetailList.isPresent()) {
-				for (OrderDetail od : orderDetailList.get()) {
-					if(extraOrderDetailList.isPresent()) {
-						for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
-							if(ex.getOrderDetail().getId() == od.getId()) {
-								ex.getExtra().setQuantity(ex.getQuantity());
-								extras.add(ex.getExtra());
-							}
-							//Por cada extra...
-						}
-					}
-					//Por cada producto...
-					od.getProduct().setExtras(extras);
-					productDataList.add(od.getProduct());
-					extras = new ArrayList<Extra>();
-				}
-				
-			}
-			//Por cada orden...
-			if(address.isPresent()) order.getClient().setAddress(address.get());
-			order.setProducts(productDataList);
-			resultOrderList.add(order);
+			OrderResponse response = new OrderResponse();
+			getOrder(order.getId(), response);
+			 
+			resultOrderList.add(response.getOrder());
 		}
 		/*********************************************/
-		Integer chips                         = 0; 
-		Integer grilledHamburger             = 0; 
-		Integer simpleCheddar                 = 0; 
-		Integer doubleCheddar                 = 0; 
-		Integer tripleCheddar                 = 0;
-		Integer simpleEmmenthal         = 0;
-		Integer doubleEmmenthal             = 0; 
-		Integer tripleEmmenthal             = 0; 
-		Integer noCheese                     = 0; 
-		Integer orderCount                     = 0; 
-		Integer productCount                 = 0;
+		Integer chips               = 0; 
+		Integer grilledHamburger	= 0; 
+		Integer simpleCheddar       = 0; 
+		Integer doubleCheddar       = 0; 
+		Integer tripleCheddar       = 0;
+		Integer simpleEmmenthal     = 0;
+		Integer doubleEmmenthal     = 0; 
+		Integer tripleEmmenthal     = 0; 
+		Integer noCheese            = 0; 
+		Integer orderCount          = 0; 
+		Integer productCount        = 0;
 		
 		List<MenuRecipe> menuRecipeList = menuRecipeRepository.findAll();
 		
@@ -319,13 +293,13 @@ public class MenuService {
 				}
 				Integer cantHamburguesas     = 0;
 				Integer cheeseQuantity = 0;
-				boolean withoutCheese = false;
 				boolean cheddarFlag = true;
 				boolean alreadyAddedCheese = false;
-				
+				boolean alreadyChangedCheese = false;
+				boolean extraCheese = false;
 				List<MenuRecipe> mr = menuRecipeList.stream().filter(s -> s.getCode().equals(product.getCode())).collect(Collectors.toList());
 				for(MenuRecipe m : mr) {
-					logger.info("Recipe found(product): code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
+					logger.info("Recipe found(product): name: " + product.getName() + " code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
 					switch(m.getIdRecipe().intValue()) {
 					case 1:
 						cheeseQuantity += m.getQuantity();							
@@ -345,29 +319,33 @@ public class MenuService {
 				}
 				
 				
-				if(!product.getExtras().isEmpty()) {
+				if(product.getExtras() != null && !product.getExtras().isEmpty()) {
 					for(Extra extra : product.getExtras()) {
+						if("Sweet onion".contains(product.getName())) {
+							System.out.println("Linea de log");
+						}
 						List<MenuRecipe> recipeCollected = menuRecipeList.stream().filter(s -> s.getCode().equals(extra.getCode())).collect(Collectors.toList());
 						for(MenuRecipe m : recipeCollected) {
-							logger.info("Recipe found(extra): code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
+							boolean isCheese = false;
+							logger.info("Recipe found(extra): "+extra.getName()+" code " + m.getCode() +" quantity: "+ m.getQuantity() +" ingrediente: " + m.getIdRecipe());
 							switch(m.getIdRecipe().intValue()) {
 							case 1:
-								if(m.getQuantity() == -1) {
-									withoutCheese = true;
-								}else if(m.getQuantity() == 0) {
+								isCheese = true;
+								if(m.getQuantity() == 0 && !alreadyChangedCheese) {
 									cheddarFlag = false;
+									alreadyChangedCheese = true;
 								}else if(!alreadyAddedCheese) {
-									cheeseQuantity += m.getQuantity() * extra.getQuantity();
+									cheeseQuantity += m.getQuantity();
 									alreadyAddedCheese = true;
 								}
 								break;
 							case 2:
-								if(m.getQuantity() == -1) {
-									withoutCheese = true;
-								}else if(m.getQuantity() == 0) {
+								isCheese = true;
+								if(m.getQuantity() == 0 && !alreadyChangedCheese) {
 									cheddarFlag = true;
+									alreadyChangedCheese = true;
 								}else if(!alreadyAddedCheese) {
-									cheeseQuantity += m.getQuantity() * extra.getQuantity();
+									cheeseQuantity += m.getQuantity();
 									alreadyAddedCheese = true;
 								}
 								break;
@@ -378,52 +356,78 @@ public class MenuService {
 								chips += m.getQuantity() * extra.getQuantity();
 								break;
 							}
-							
-							
+														
+							if(isCheese) {		
+								extraCheese = true;
+								if(cheddarFlag) {
+									switch(cheeseQuantity) {
+									case -1://Sin queso
+										noCheese += 0;
+										break;
+									case 1://Queso simple
+										extraCheese = false;
+										break;
+									case 2://Queso doble
+										doubleCheddar += extra.getQuantity();
+										break;
+									case 3://Queso triple
+										tripleCheddar += extra.getQuantity();
+										break;
+									}					
+								}else {
+									switch(cheeseQuantity) {
+									case 0://Sin queso
+										noCheese += 0;
+										break;
+									case 1://Queso simple
+										//En este punto es porque no suma por extra sino por hamburguesa
+										extraCheese = false;
+										break;
+									case 2://Queso doble
+										doubleEmmenthal +=  extra.getQuantity();
+										break;
+									case 3://Queso triple
+										tripleEmmenthal += extra.getQuantity();
+										break;
+									}
+								}
+							}
 						}
 					}					
 				}
-				
-				if(withoutCheese) {
-					cheeseQuantity = 0;
-				}
-				
+								
 				grilledHamburger += cantHamburguesas;
 				
-				if(cheddarFlag) {
-					switch(cheeseQuantity) {
-					case 0://Sin queso
-						noCheese += cantHamburguesas;
-						break;
-					case 1://Queso simple
-						simpleCheddar += cantHamburguesas;
-						break;
-					case 2://Queso doble
-						doubleCheddar += cantHamburguesas;
-						break;
-					case 3://Queso triple
-						tripleCheddar += cantHamburguesas;
-						break;
+				if(!extraCheese) {
+					if(cheddarFlag) {
+						switch(cheeseQuantity) {
+						case -1://Sin queso
+							noCheese += 0;
+							break;
+						case 1://Queso simple
+							simpleCheddar += cantHamburguesas;
+							break;
+						case 2://Queso doble
+							doubleCheddar += cantHamburguesas;
+							break;
 						
-					}					
-				}else {
-					switch(cheeseQuantity) {
-					case 0://Sin queso
-						noCheese += cantHamburguesas;
-						break;
-					case 1://Queso simple
-						simpleEmmenthal += cantHamburguesas;
-						break;
-					case 2://Queso doble
-						doubleEmmenthal += cantHamburguesas;
-						break;
-					case 3://Queso triple
-						tripleEmmenthal += cantHamburguesas;
-						break;
+						}					
+					}else {
+						switch(cheeseQuantity) {
+						case 0://Sin queso
+							noCheese += 0;
+							break;
+						case 1://Queso simple
+							simpleEmmenthal += cantHamburguesas;
+							break;
+						case 2://Queso doble
+							doubleEmmenthal +=  cantHamburguesas;
+							break;
 						
+						}
 					}
 				}
-				
+
 			}
 		}
 		kitchenResponse.setKitchenStatus(new KitchenStatus());
@@ -634,7 +638,7 @@ public class MenuService {
 			//Formo la respuesta del servicios
 			orderResponse.setAddress(address);
 			orderResponse.setOrder(order);
-			orderResponse.setProducts(orderRequest.getProducts());
+			orderResponse.setProducts(response.getOrder().getProducts());
 			orderResponse.setMessage(ResponseCode.OK.fieldName());
 			orderResponse.setCode(ResponseCode.OK.fieldNumber());
 			orderResponse.setStatus(HttpStatus.OK.value());
@@ -808,17 +812,19 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 			List<Product> productDataList = new ArrayList<Product>();
 			if(orderDetailList.isPresent()) {
 				for (OrderDetail od : orderDetailList.get()) {
+					Product prod = (Product) od.getProduct().clone();
 					if(extraOrderDetailList.isPresent()) {		
 						for(ExtraOrderDetail ex : extraOrderDetailList.get()) {
 							if(ex.getOrderDetail().getId() == od.getId()) {
-								ex.getExtra().setQuantity(ex.getQuantity());
-								extras.add(ex.getExtra());
+								Extra extra = (Extra) ex.getExtra().clone();
+								extra.setQuantity(ex.getQuantity());
+								extras.add(extra);
 							}
 						}
+						prod.setExtras(extras);
+						extras = new ArrayList<Extra>();
 					}
-					od.getProduct().setExtras(extras);
-					productDataList.add(od.getProduct());
-					extras = new ArrayList<Extra>();
+					productDataList.add(prod);
 				}
 			}
 			order.get().setProducts(productDataList);
@@ -1120,7 +1126,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	            message += "🚗 Elegí que me entreguen el pedido en la siguiente dirección: \n";
 	            message += "Calle " + order.getClient().getAddress().getStreet() + " " + order.getClient().getAddress().getDoorNumber() + "\n\n";
 	        }else {
-	        	message += "Elegí retirar el pedido por el local en la dirección https://goo.gl/maps/S3B6cKqVeGbQhHL58"+"\n";
+	        	message += "Elegí retirar el pedido en el local "+"\n";
 	        }
 	        message += "Forma de pago: " + order.getPaymentType() + "\n";
 	        if(order.getComments() != null && !order.getComments().trim().isEmpty()) {
@@ -1128,7 +1134,7 @@ public HttpStatus cancelOrder(OrderRequest orderRequest, OrderResponse orderResp
 	        }
 	        //message += "Gracias por confiar en Vanburga!";
 	        String path = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
-			String link = "https://wa.me/5491168929067/?text="+path;
+			String link = "https://wa.me/5491157690039/?text="+path;
 	        return link;
 	}
 

@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Extra {
+public class Extra implements Cloneable{
 
 	@Id
 	private Long id;
@@ -30,4 +30,13 @@ public class Extra {
 	
 	private Boolean available;
 	
+	public Object clone(){
+        Object obj=null;
+        try{
+            obj=super.clone();
+        }catch(CloneNotSupportedException ex){
+            System.out.println(" no se puede duplicar");
+        }
+        return obj;
+    }
 }

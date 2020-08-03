@@ -352,10 +352,11 @@ UPDATE Extra SET AVAILABLE = FALSE WHERE ID=8; ##Cheddar papas
 UPDATE Extra SET AVAILABLE = FALSE WHERE ID=9; ##Cheddar y bacon papas
 
 ##Sets businessSchedule
-insert into BusinessSchedule (day, openTime, closeTime, available) values ('Jueves', '19:00:00', '01:00:00', true);
-insert into BusinessSchedule (day, openTime, closeTime ,available) values ('Viernes', '19:00:00', '01:00:00', true);
-insert into BusinessSchedule (day, openTime, closeTime,available) values ('Sabado', '19:00:00', '01:00:00', true);
-insert into BusinessSchedule (day, openTime, closeTime,available) values ('Domingo', '19:00:00', '01:00:00', true);
+insert into BusinessSchedule (day, openTime, closeTime, available) values ( "Miercoles", '19:30:00', '22:30:00', true );
+insert into BusinessSchedule (day, openTime, closeTime, available) values ( "Jueves", '19:30:00', '22:30:00', true );
+insert into BusinessSchedule (day, openTime, closeTime, available) values ( "Viernes", '19:30:00', '23:00:00', true );
+insert into BusinessSchedule (day, openTime, closeTime, available) values ( "Sabado", '19:30:00', '23:00:00', true );
+insert into BusinessSchedule (day, openTime, closeTime, available) values ( "Domingo", '19:30:00', '23:00:00', true );
 /*
 select ord.id, ord.delivery, ord.status, ord.comments, ord.createDate, ord.amount,
 cli.id as clientId, cli.name, cli.lastName, cli.cellphone, cli.mail,
